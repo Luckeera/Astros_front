@@ -7,7 +7,7 @@ const TheProblem = () => {
       <div className="max-w-7xl mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-20">
           <h2 className="text-[10px] font-black text-[#FFA900] uppercase tracking-[0.3em] mb-4">O Cenário Atual</h2>
-          <h3 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight">O Silo que custa caro para as IES.</h3>
+          <h3 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight">O Silo que limita a Inovação Acadêmica.</h3>
         </div>
         
         <div className="grid md:grid-cols-3 gap-8">
@@ -15,9 +15,9 @@ const TheProblem = () => {
             <div className="h-16 w-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-red-500 group-hover:text-white transition-colors">
               <AlertCircle className="h-8 w-8" />
             </div>
-            <h4 className="text-2xl font-black text-gray-900 mb-4">57,2% de Evasão</h4>
+            <h4 className="text-2xl font-black text-gray-900 mb-4">Desafio da Permanência</h4>
             <p className="text-gray-500 font-medium leading-relaxed">
-              O desengajamento prático é a principal causa da evasão no ensino superior. O aluno não vê conexão entre a teoria e o impacto real.
+              A desmotivação acadêmica é um dos principais fatores de evasão. O aluno busca propósito e conexão entre a teoria e o impacto real na sociedade.
             </p>
           </div>
           
@@ -25,9 +25,9 @@ const TheProblem = () => {
             <div className="h-16 w-16 bg-amber-50 text-[#FFA900] rounded-2xl flex items-center justify-center mb-8 group-hover:bg-[#FFA900] group-hover:text-white transition-colors">
               <Target className="h-8 w-8" />
             </div>
-            <h4 className="text-2xl font-black text-gray-900 mb-4">MEC & Extensão</h4>
+            <h4 className="text-2xl font-black text-gray-900 mb-4">Extensão Universitária</h4>
             <p className="text-gray-500 font-medium leading-relaxed">
-              A dificuldade de comprovar os 10% de carga horária da Curricularização da Extensão gera gargalos administrativos e riscos em auditorias.
+              A integração sistemática da extensão ao currículo exige ferramentas que facilitem o registro e a visibilidade das interações interdisciplinares reais.
             </p>
           </div>
           

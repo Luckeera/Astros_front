@@ -6,14 +6,14 @@ export default function FinancialROI() {
     <div className="bg-white rounded-[3rem] p-8 md:p-14 shadow-2xl shadow-[#FFA900]/10 border-2 border-gray-100 flex flex-col lg:flex-row gap-12 items-center">
       <div className="flex-1">
         <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#FFA900]/10 text-black font-black rounded-xl text-sm mb-6 border border-[#FFA900]/20">
-          <CircleDollarSign className="h-4 w-4 text-[#FFA900]" /> Retenção e LTV
+          <CircleDollarSign className="h-4 w-4 text-[#FFA900]" /> Engajamento e Permanência
         </div>
-        <h3 className="text-3xl lg:text-4xl font-black text-gray-900 mb-6 leading-tight">A hemorragia financeira da evasão.</h3>
+        <h3 className="text-3xl lg:text-4xl font-black text-gray-900 mb-6 leading-tight">O Desafio do Engajamento e o Isolamento das Disciplinas.</h3>
         <p className="text-lg text-gray-600 font-medium mb-6 leading-relaxed">
-          Dados do Mapa do Ensino Superior e do Inep atestam que a taxa de evasão global atinge impressionantes <strong className="text-gray-900 bg-[#FFA900]/20 px-1 rounded">57,2%</strong> (chegando a <strong className="text-gray-900 bg-[#FFA900]/20 px-1 rounded">61% na rede privada</strong>). A perda de um aluno representa a destruição direta do <em>Lifetime Value (LTV)</em> e das mensalidades recorrentes.
+          A fragmentação do conhecimento e a falta de aplicação prática são as principais causas da desmotivação acadêmica. Quando o aluno não enxerga a aplicabilidade do que estuda ou se sente isolado em sua própria disciplina, o risco de evasão aumenta drasticamente, impactando a qualidade pedagógica e a vitalidade da instituição.
         </p>
         <p className="text-lg text-gray-600 font-medium leading-relaxed">
-          O Astros estanca essa evasão fornecendo afiliação social. Transforma impulsos efêmeros — como uma "Semana Ubíqua" — em projetos persistentes de longo prazo. Metodologias baseadas em projetos práticos blindam o aluno contra a desmotivação e o abandono de curso.
+          O Astros soluciona esse problema criando uma ponte entre cursos. Durante a **Semana Ubíqua**, enquanto turmas de diversas áreas propõem desafios e temas reais, os alunos de tecnologia utilizam a plataforma para assumir esses projetos, construindo soluções em formato de MVP e fortalecendo o senso de comunidade, pertencimento e propósito.
         </p>
       </div>
       

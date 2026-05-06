@@ -9,14 +9,14 @@ export default function RegulatoryCompliance() {
       <div className="flex flex-col lg:flex-row-reverse gap-12 items-center relative z-10">
         <div className="flex-1">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#FFA900]/20 text-[#FFA900] font-black rounded-xl text-sm mb-6 border border-[#FFA900]/30">
-            <Scale className="h-4 w-4" /> Adequação Regulatória
+            <Scale className="h-4 w-4" /> Excelência na Extensão
           </div>
-          <h3 className="text-3xl lg:text-4xl font-black text-white mb-6 leading-tight">Automatização dos 10% da Curricularização da Extensão.</h3>
+          <h3 className="text-3xl lg:text-4xl font-black text-white mb-6 leading-tight">Facilitação da Curricularização da Extensão.</h3>
           <p className="text-lg text-gray-400 font-medium mb-6 leading-relaxed">
-            A Resolução CNE/CES nº 7/2018 exige que toda IES dedique 10% da carga horária para extensão universitária. Mapear e documentar essa obrigatoriedade para milhares de alunos em dezenas de cursos é um pesadelo logístico.
+            A integração da extensão universitária ao currículo é um desafio pedagógico fundamental. O Astros facilita esse processo, permitindo que as atividades interdisciplinares sejam documentadas de forma fluida e integrada à jornada do aluno, fortalecendo o vínculo com a comunidade.
           </p>
           <p className="text-lg text-gray-400 font-medium leading-relaxed">
-            A Plataforma Astros funciona como a infraestrutura de controle oficial: centraliza a interação dialógica interdisciplinar e gera relatórios precisos. Elimina planilhas analógicas, garantindo evidências rastreáveis essenciais para avaliadores do MEC (Conceito 5 no Inep).
+            Nossa plataforma atua como um ecossistema de colaboração: centraliza o diálogo interdisciplinar e gera portfólios de atividades. Ao invés de meras planilhas, oferecemos evidências qualitativas do engajamento estudantil, fundamentais para a valorização institucional e excelência acadêmica.
           </p>
         </div>
         
@@ -26,8 +26,8 @@ export default function RegulatoryCompliance() {
               <FileCheck2 className="h-10 w-10 text-black" />
             </div>
             <div>
-              <h4 className="font-bold text-xl text-white mb-1">Evidências Rastreáveis</h4>
-              <p className="text-gray-400 font-medium">Automatização do registro de horas e interação do estudante em banco de dados.</p>
+              <h4 className="font-bold text-xl text-white mb-1">Portfólio de Atividades</h4>
+              <p className="text-gray-400 font-medium">Registro qualitativo da interação e evolução do estudante em projetos reais.</p>
             </div>
           </div>
           
@@ -36,8 +36,8 @@ export default function RegulatoryCompliance() {
               <Database className="h-10 w-10 text-black" />
             </div>
             <div>
-              <h4 className="font-bold text-xl text-white mb-1">Painéis para o Inep</h4>
-              <p className="text-gray-400 font-medium">Relatórios práticos mostrando interdisciplinaridade real para comissões de auditoria.</p>
+              <h4 className="font-bold text-xl text-white mb-1">Relatórios de Impacto</h4>
+              <p className="text-gray-400 font-medium">Visibilidade clara da interdisciplinaridade e do impacto social gerado pelos projetos.</p>
             </div>
           </div>
         </div>

@@ -20,7 +20,7 @@ export default function RequestedFeatures() {
     },
     {
       title: "Mural de Eventos",
-      description: "Quadro digital de hackathons, semanas ubíquas e chamadas para desafios institucionais em um só lugar.",
+      description: "Centralize a dinâmica da Semana Ubíqua: cursos diversos postam temas e problemas reais, enquanto alunos de tecnologia filtram esses desafios para construir MVPs funcionais.",
       icon: CalendarDays
     }
   ];

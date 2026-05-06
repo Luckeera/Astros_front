@@ -8,9 +8,9 @@ export default function EmployabilityEdge() {
         <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#FFA900]/20 text-[#FFA900] font-black rounded-xl text-sm mb-6 border border-[#FFA900]/30">
           <Building2 className="h-4 w-4" /> Universidade Empreendedora
         </div>
-        <h3 className="text-3xl lg:text-4xl font-black text-white mb-6 max-w-3xl mx-auto leading-tight">O Skill Gap e o Benchmarking de Ponta.</h3>
+        <h3 className="text-3xl lg:text-4xl font-black text-white mb-6 max-w-3xl mx-auto leading-tight">Desenvolvimento de Competências e Inovação Pedagógica.</h3>
         <p className="text-lg text-gray-400 font-medium mb-16 max-w-4xl mx-auto leading-relaxed">
-          As exigências do mercado mudaram drasticamente. Segundo o Fórum Econômico Mundial (WEF), profissionais analógicos estão obsoletos. O Astros transforma a instituição educacional baseada em "silos" em um verdadeiro Hub de Inovação Aberta, alinhado aos cases de sucesso mais rentáveis do ensino contemporâneo.
+          A integração entre teoria e prática é fundamental para a formação contemporânea. O Astros transforma a instituição educacional baseada em "silos" em um verdadeiro Hub de Inovação Aberta, promovendo uma aprendizagem significativa alinhada às melhores práticas pedagógicas globais.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -18,9 +18,9 @@ export default function EmployabilityEdge() {
             <div className="bg-[#FFA900]/10 p-4 rounded-2xl w-fit mb-6 group-hover:bg-[#FFA900] transition-colors">
               <GraduationCap className="h-8 w-8 text-[#FFA900] group-hover:text-black transition-colors" />
             </div>
-            <h4 className="text-2xl font-black text-gray-900 mb-4">Benchmarking Global</h4>
+            <h4 className="text-2xl font-black text-gray-900 mb-4">Metodologias Ativas</h4>
             <p className="text-gray-600 font-medium leading-relaxed">
-              Mimetiza a Aprendizagem Baseada em Projetos (PBL) interprofissional de instituições como Insper, Minerva e CESAR School, sem a barreira do custo logístico físico absurdo.
+              Mimetiza a Aprendizagem Baseada em Projetos (PBL) interprofissional de instituições de referência, promovendo o protagonismo do aluno no processo de ensino-aprendizagem.
             </p>
           </div>
           
@@ -30,7 +30,7 @@ export default function EmployabilityEdge() {
             </div>
             <h4 className="text-2xl font-black text-gray-900 mb-4">Hard & Soft Skills</h4>
             <p className="text-gray-600 font-medium leading-relaxed">
-              Forja as skills priorizadas pelo "Future of Jobs Report 2023": Alfabetização Tecnológica para as Ciências Humanas e "Escuta Ativa / Empatia" para a Engenharia.
+              Forja as competências priorizadas pelo mercado atual: Alfabetização Tecnológica para as Ciências Humanas e "Escuta Ativa / Empatia" para a Engenharia e Tecnologia.
             </p>
           </div>
           
@@ -38,9 +38,9 @@ export default function EmployabilityEdge() {
             <div className="bg-[#FFA900]/10 p-4 rounded-2xl w-fit mb-6 group-hover:bg-[#FFA900] transition-colors">
               <Lightbulb className="h-8 w-8 text-[#FFA900] group-hover:text-black transition-colors" />
             </div>
-            <h4 className="text-2xl font-black text-gray-900 mb-4">Vitrine Comercial</h4>
+            <h4 className="text-2xl font-black text-gray-900 mb-4">Portfólio de Excelência</h4>
             <p className="text-gray-600 font-medium leading-relaxed">
-              Startups acadêmicas atuam como ferramenta agressiva de Marketing. Nutre o CRM da instituição com vitrines de inovação, reduzindo o Custo de Aquisição de Clientes (CAC).
+              Projetos interdisciplinares transformados em ativos reais para o currículo. Nutre o portfólio da instituição com cases de inovação, fortalecendo o prestígio acadêmico.
             </p>
           </div>
         </div>
