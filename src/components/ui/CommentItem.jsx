@@ -16,9 +16,9 @@ const CommentItem = ({ comment, depth = 0, onReply, onToggleLike }) => (
     <div className="flex items-center gap-6 mt-4 ml-2">
       <button 
         onClick={() => onToggleLike(comment.comment_id)}
-        className="flex items-center gap-2 text-gray-400 hover:text-pink-500 transition-colors group"
+        className={`flex items-center gap-2 transition-colors group ${comment.is_liked ? 'text-pink-500' : 'text-gray-400 hover:text-pink-500'}`}
       >
-        <Heart className="h-4 w-4 group-active:scale-150 transition-transform" /> <span className="text-[10px] font-black">{comment.upvotes}</span>
+        <Heart className={`h-4 w-4 group-active:scale-150 transition-transform ${comment.is_liked ? 'fill-pink-500' : ''}`} /> <span className="text-[10px] font-black">{comment.upvotes}</span>
       </button>
       <button 
         onClick={() => onReply(comment)}

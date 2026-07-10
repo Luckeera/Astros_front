@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import OrbitIcon from '../icons/OrbitIcon';
-import { collaborationService } from '../services/api';
+import { messageService } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import FeedbackModal from './ui/FeedbackModal';
 
@@ -9,13 +9,15 @@ const ContributionModal = ({ post, onClose }) => {
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
   const [feedback, setFeedback] = useState({ open: false, type: 'success', title: '', message: '' });
-  const { token } = useAuth();
+  const { token, user: currentUser } = useAuth();
 
   const handleSend = async () => {
     if (!message.trim()) return;
     setSending(true);
     try {
-      await collaborationService.contribute(token, post.post_id, message);
+      const chatData = await messageService.createDM(token, currentUser.user_id, post.author.user_id);
+      await messageService.sendPresentation(token, chatData.chat_id, message, post.author.user_id, post.project_id);
+      
       setFeedback({
         open: true,
         type: 'success',
@@ -28,7 +30,7 @@ const ContributionModal = ({ post, onClose }) => {
       let errorTitle = 'Pouso Forçado';
       let errorMsg = 'Não conseguimos enviar sua proposta agora.';
       
-      if (err.message.includes('403')) {
+      if (err.message && err.message.includes('403')) {
         errorTitle = 'Acesso Negado';
         errorMsg = 'Você não pode colaborar no seu próprio projeto ou seu curso não é o alvo desta vez.';
       }
@@ -46,7 +48,13 @@ const ContributionModal = ({ post, onClose }) => {
 
   const closeWithSuccess = () => {
     setFeedback({ ...feedback, open: false });
-    if (feedback.type === 'success') onClose();
+    if (feedback.type === 'success') {
+      onClose();
+      // Dispara o evento para abrir o chat automaticamente, educando o usuário
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('open-chat'));
+      }, 300); // Pequeno atraso para a animação do modal fechar
+    }
   };
 
   return (

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, ChevronDown, User, LogOut } from 'lucide-react';
+import { Search, ChevronDown, User, LogOut, Briefcase } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import OrbitIcon from '../icons/OrbitIcon';
@@ -72,6 +72,12 @@ const Navbar = () => {
                 className="w-full px-5 py-3 text-left text-sm font-bold text-gray-700 hover:bg-gray-50 flex items-center gap-4 transition-colors"
               >
                 <div className="p-2 bg-blue-50 rounded-lg text-blue-500"><User className="h-4 w-4" /></div> Meu Perfil
+              </button>
+              <button 
+                onClick={() => { navigate('/projects'); setIsMenuOpen(false); }}
+                className="w-full px-5 py-3 text-left text-sm font-bold text-gray-700 hover:bg-gray-50 flex items-center gap-4 transition-colors"
+              >
+                <div className="p-2 bg-[#FFA900]/10 rounded-lg text-[#FFA900]"><Briefcase className="h-4 w-4" /></div> Meus Projetos
               </button>
               <div className="h-px bg-gray-100 my-2 mx-4" />
               <button 

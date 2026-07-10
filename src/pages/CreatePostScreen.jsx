@@ -2,16 +2,32 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Sparkles, Check } from 'lucide-react';
 import OrbitIcon from '../icons/OrbitIcon';
 import { useAuth } from '../context/AuthContext';
-import { postService, courseService } from '../services/api';
+import { postService, courseService, projectService } from '../services/api';
 
 const CreatePostScreen = ({ onCancel }) => {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [isCollaborative, setIsCollaborative] = useState(false);
   const [availableCourses, setAvailableCourses] = useState([]);
   const [selectedCourseIds, setSelectedCourseIds] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [userProjects, setUserProjects] = useState([]);
+  const [selectedProjectId, setSelectedProjectId] = useState('');
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const data = await projectService.getUserProjects(token, user.user_id);
+        setUserProjects(data.projects || data);
+      } catch (err) {
+        console.error('Erro ao carregar projetos:', err);
+      }
+    };
+    if (token && user) {
+      fetchProjects();
+    }
+  }, [token, user]);
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -52,14 +68,26 @@ const CreatePostScreen = ({ onCancel }) => {
 
   const handleSubmit = async () => {
     if (!title.trim() || !content.trim()) return;
+    if (isCollaborative && !selectedProjectId) {
+      alert("Selecione um projeto para a colaboração.");
+      return;
+    }
     setIsSubmitting(true);
     try {
-      await postService.createPost(token, {
-        title,
-        content,
-        is_collaborative: isCollaborative,
-        target_courses: selectedCourseIds
-      });
+      if (isCollaborative) {
+        await postService.createCollabPost(token, selectedProjectId, {
+          title,
+          content,
+          target_courses: selectedCourseIds
+        });
+      } else {
+        await postService.createPost(token, {
+          title,
+          content,
+          is_collaborative: false,
+          target_courses: selectedCourseIds
+        });
+      }
       onCancel(); 
     } catch (err) {
       console.error('Erro ao criar post:', err);
@@ -140,23 +168,41 @@ const CreatePostScreen = ({ onCancel }) => {
           })}
         </div>
 
-        <label 
-          onClick={() => setIsCollaborative(!isCollaborative)}
-          className={`flex items-center justify-between p-8 rounded-2xl border cursor-pointer group transition-all border-dashed ring-1 ring-transparent ${isCollaborative ? 'bg-orange-50 border-[#FFA900] ring-[#FFA900]/20' : 'bg-gray-50/50 border-gray-100 hover:bg-orange-50/50 hover:border-[#FFA900] hover:ring-[#FFA900]/10'}`}
-        >
-          <div className="flex items-center gap-6">
-            <div className={`p-5 rounded-xl shadow-lg transition-all border ${isCollaborative ? 'bg-[#FFA900] text-black border-transparent scale-110 rotate-3' : 'bg-white text-[#FFA900] border-gray-50 group-hover:scale-110 group-hover:rotate-12'}`}>
-              <OrbitIcon className="h-8 w-8" />
+        <div className="space-y-4">
+          <label 
+            onClick={() => setIsCollaborative(!isCollaborative)}
+            className={`flex items-center justify-between p-8 rounded-2xl border cursor-pointer group transition-all border-dashed ring-1 ring-transparent ${isCollaborative ? 'bg-orange-50 border-[#FFA900] ring-[#FFA900]/20' : 'bg-gray-50/50 border-gray-100 hover:bg-orange-50/50 hover:border-[#FFA900] hover:ring-[#FFA900]/10'}`}
+          >
+            <div className="flex items-center gap-6">
+              <div className={`p-5 rounded-xl shadow-lg transition-all border ${isCollaborative ? 'bg-[#FFA900] text-black border-transparent scale-110 rotate-3' : 'bg-white text-[#FFA900] border-gray-50 group-hover:scale-110 group-hover:rotate-12'}`}>
+                <OrbitIcon className="h-8 w-8" />
+              </div>
+              <div>
+                <span className="block text-lg font-black text-gray-900 uppercase tracking-tighter leading-none">Colaboração Acadêmica</span>
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-1.5 block">Habilitar busca por parceiros de projeto</span>
+              </div>
             </div>
-            <div>
-              <span className="block text-lg font-black text-gray-900 uppercase tracking-tighter leading-none">Colaboração Acadêmica</span>
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-1.5 block">Habilitar busca por parceiros de projeto</span>
+            <div className={`w-10 h-10 border-2 rounded-xl flex items-center justify-center transition-colors ${isCollaborative ? 'bg-[#FFA900] border-[#FFA900]' : 'bg-white border-gray-200 group-hover:border-[#FFA900]'}`}>
+              <Sparkles className={`h-5 w-5 transition-colors ${isCollaborative ? 'text-black' : 'text-gray-200 group-hover:text-[#FFA900]'}`} />
             </div>
-          </div>
-          <div className={`w-10 h-10 border-2 rounded-xl flex items-center justify-center transition-colors ${isCollaborative ? 'bg-[#FFA900] border-[#FFA900]' : 'bg-white border-gray-200 group-hover:border-[#FFA900]'}`}>
-            <Sparkles className={`h-5 w-5 transition-colors ${isCollaborative ? 'text-black' : 'text-gray-200 group-hover:text-[#FFA900]'}`} />
-          </div>
-        </label>
+          </label>
+          
+          {isCollaborative && (
+            <div className="p-6 bg-white border border-[#FFA900]/30 rounded-2xl shadow-sm animate-in fade-in slide-in-from-top-4">
+              <label className="block text-[10px] font-black text-[#FFA900] uppercase tracking-[0.3em] mb-4">Vincular a qual projeto?</label>
+              <select 
+                value={selectedProjectId}
+                onChange={(e) => setSelectedProjectId(e.target.value)}
+                className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-4 focus:ring-[#FFA900]/10 focus:border-[#FFA900] font-bold text-gray-800 text-sm"
+              >
+                <option value="">Selecione um projeto...</option>
+                {userProjects.map(p => (
+                  <option key={p.project_id} value={p.project_id}>{p.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
+        </div>
 
         <div className="flex flex-col sm:flex-row justify-end gap-6 pt-6">
           <button 
