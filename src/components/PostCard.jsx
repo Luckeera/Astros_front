@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Sparkles, Heart, MessageSquare } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { postService } from '../services/api';
@@ -6,6 +7,7 @@ import ContributionModal from './ContributionModal';
 
 const PostCard = ({ post, onNavigateToDetail }) => {
   const { token, user: currentUser } = useAuth();
+  const navigate = useNavigate();
   const [isLiked, setIsLiked] = useState(post.is_liked || false);
   const [upvotes, setUpvotes] = useState(post.upvotes || 0);
   const [showCollabModal, setShowCollabModal] = useState(false);
@@ -31,6 +33,11 @@ const PostCard = ({ post, onNavigateToDetail }) => {
     setShowCollabModal(true);
   };
 
+  const handleProfileClick = (e) => {
+    e.stopPropagation();
+    navigate(`/profile/${post.author_id}`);
+  };
+
   const isAuthor = currentUser?.user_id === post.author_id;
 
   return (
@@ -50,12 +57,12 @@ const PostCard = ({ post, onNavigateToDetail }) => {
       
       <div className="p-8">
         <div className="flex justify-between items-start mb-6">
-          <div className="flex gap-4">
+          <div className="flex gap-4 cursor-pointer hover:opacity-80 transition-opacity" onClick={handleProfileClick}>
             <div className="h-12 w-12 bg-gray-50 rounded-xl flex items-center justify-center text-[#FFA900] font-black text-sm border border-gray-100 shadow-sm">
               {post.author?.name?.[0] || 'A'}
             </div>
             <div>
-              <h4 className="text-sm font-black text-gray-900 leading-none mb-1.5">
+              <h4 className="text-sm font-black text-gray-900 leading-none mb-1.5 hover:underline">
                 {post.author?.name || `Usuário #${post.author_id}`}
               </h4>
               <p className="text-[11px] text-gray-400 font-black flex items-center gap-2 uppercase tracking-tight">

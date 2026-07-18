@@ -29,7 +29,7 @@ const FeedScreen = ({ onNavigateToDetail }) => {
   }, [filter, user, token]);
 
   return (
-    <div className="max-w-2xl mx-auto py-12 px-4">
+    <div className="w-full max-w-3xl mx-auto py-12 px-4 md:px-6">
       <header className="mb-12 text-center">
         <h2 className="text-4xl font-black text-gray-900 tracking-tighter mb-3">Feed Acadêmico</h2>
         <p className="text-gray-400 font-bold text-xs uppercase tracking-[0.2em]">Explore projetos e conexões na sua área.</p>

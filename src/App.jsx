@@ -6,6 +6,7 @@ import Navbar from './components/Navbar';
 import ChatWindow from './components/ChatWindow';
 import FeedScreen from './pages/FeedScreen';
 import ProfileScreen from './pages/ProfileScreen';
+import UserProfileScreen from './pages/UserProfileScreen';
 import PostDetailScreen from './pages/PostDetailScreen';
 import CreatePostScreen from './pages/CreatePostScreen';
 import LoginScreen from './pages/LoginScreen';
@@ -114,6 +115,12 @@ const AppRoutes = () => {
       <Route path="/profile" element={
         <AppLayout>
           <ProfileScreen />
+        </AppLayout>
+      } />
+      
+      <Route path="/profile/:userId" element={
+        <AppLayout>
+          <UserProfileScreen />
         </AppLayout>
       } />
       

@@ -49,7 +49,7 @@ const ProjectDashboardScreen = () => {
       ) : projects.length > 0 ? (
         <div className="grid gap-6">
           {projects.map((proj) => {
-            const isLeader = proj.leader_id === currentUser.user_id;
+            const isLeader = proj.creator_id === currentUser.user_id;
             return (
               <div 
                 key={proj.project_id} 
@@ -57,12 +57,12 @@ const ProjectDashboardScreen = () => {
                 className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all cursor-pointer group"
               >
                 <div className="flex justify-between items-start mb-4">
-                  <div className="flex items-center gap-4">
-                    <div className="h-14 w-14 bg-gray-50 rounded-2xl flex items-center justify-center text-[#FFA900] group-hover:bg-[#FFA900] group-hover:text-white transition-colors">
+                  <div className="flex items-center gap-4 flex-1 overflow-hidden pr-4">
+                    <div className="h-14 w-14 flex-shrink-0 bg-gray-50 rounded-2xl flex items-center justify-center text-[#FFA900] group-hover:bg-[#FFA900] group-hover:text-white transition-colors">
                       <Briefcase className="h-6 w-6" />
                     </div>
-                    <div>
-                      <h3 className="text-xl font-black text-gray-900">{proj.name}</h3>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-xl font-black text-gray-900 truncate" title={proj.name}>{proj.name}</h3>
                       <div className="flex items-center gap-2 mt-1">
                         <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md ${proj.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                           {proj.is_active ? 'Ativo' : 'Inativo'}

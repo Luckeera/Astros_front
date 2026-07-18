@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, MessageSquare, X, Heart } from 'lucide-react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { postService } from '../services/api';
 import OrbitIcon from '../icons/OrbitIcon';
@@ -9,6 +9,7 @@ import CommentItem from '../components/ui/CommentItem';
 
 const PostDetailScreen = ({ onBack }) => {
   const { postId } = useParams();
+  const navigate = useNavigate();
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [commentContent, setCommentContent] = useState('');
@@ -94,12 +95,15 @@ const PostDetailScreen = ({ onBack }) => {
       <div className="bg-white rounded-3xl border border-gray-100 shadow-2xl shadow-gray-200/40 overflow-hidden ring-1 ring-black/5">
         <div className="p-12">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mb-12">
-            <div className="flex items-center gap-5">
+            <div 
+              className="flex items-center gap-5 cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={() => navigate(`/profile/${post.author_id}`)}
+            >
               <div className="h-16 w-16 bg-[#FFA900] rounded-xl flex items-center justify-center text-white font-black text-2xl shadow-xl shadow-[#FFA900]/20">
                 {post.author?.name?.[0] || 'A'}
               </div>
               <div>
-                <h4 className="font-black text-xl text-gray-900 tracking-tighter leading-none mb-1.5">{post.author?.name}</h4>
+                <h4 className="font-black text-xl text-gray-900 tracking-tighter leading-none mb-1.5 hover:underline">{post.author?.name}</h4>
                 <p className="text-[11px] text-gray-400 font-black uppercase tracking-[0.2em]">{post.author?.course?.name} • {post.author?.period}º Período</p>
               </div>
             </div>

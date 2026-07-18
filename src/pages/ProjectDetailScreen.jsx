@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { projectService } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { ArrowLeft, UserPlus, LogOut, Trash2, Power } from 'lucide-react';
+import { ArrowLeft, UserPlus, LogOut, Trash2, Power, Users } from 'lucide-react';
 import FeedbackModal from '../components/ui/FeedbackModal';
+import ProjectChatSection from '../components/ProjectChatSection';
+import ProjectInvites from '../components/ProjectInvites';
 
 const ProjectDetailScreen = () => {
   const { projectId } = useParams();
@@ -59,24 +61,32 @@ const ProjectDetailScreen = () => {
 
   if (!project) return null;
 
-  const isLeader = project.leader_id === currentUser?.user_id;
+  const isLeader = project.creator_id === currentUser?.user_id;
+
+  const allTeamMembers = [
+    { user_id: project.creator_id, name: project.creator_name || 'Líder', role: 'Líder' },
+    ...(project.participants_info || [])
+      .filter(p => p.user_id !== project.creator_id)
+      .map(p => ({ ...p, role: 'Membro' }))
+  ];
 
   return (
-    <div className="max-w-4xl mx-auto px-6 pt-32 pb-40">
+    <div className="w-full max-w-6xl mx-auto px-4 md:px-6 lg:px-8 pt-32 pb-40">
       <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-gray-500 hover:text-gray-900 font-bold mb-8 transition-colors">
         <ArrowLeft className="h-5 w-5" /> Voltar
       </button>
 
-      <div className="bg-white p-10 rounded-[2.5rem] shadow-2xl border border-gray-100 mb-8">
-        <div className="flex justify-between items-start mb-8">
-          <div>
+      <div className="flex flex-col lg:flex-row gap-6 mb-8 items-start">
+        <div className="bg-white p-10 rounded-[2.5rem] shadow-2xl border border-gray-100 flex-1 w-full min-w-0">
+        <div className="flex justify-between items-start mb-8 gap-4">
+          <div className="flex-1 min-w-0">
             <div className="flex items-center gap-3 mb-4">
               <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg ${project.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                 {project.is_active ? 'Projeto Ativo' : 'Projeto Inativo'}
               </span>
             </div>
-            <h1 className="text-4xl font-black text-gray-900 tracking-tighter mb-4">{project.name}</h1>
-            <p className="text-gray-600 font-medium leading-relaxed">{project.description}</p>
+            <h1 className="text-4xl font-black text-gray-900 tracking-tighter mb-4 break-words">{project.name}</h1>
+            <p className="text-gray-600 font-medium leading-relaxed break-words">{project.description}</p>
           </div>
 
           {isLeader && (
@@ -114,31 +124,40 @@ const ProjectDetailScreen = () => {
           
           <div className="space-y-4">
             {project.roles && project.roles.length > 0 ? project.roles.map((role) => (
-              <div key={role.role_id} className="p-6 bg-gray-50 border border-gray-100 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div key={role.id} className="p-6 bg-gray-50 border border-gray-100 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                  <h3 className="text-sm font-black text-gray-900 uppercase tracking-tight">{role.title}</h3>
-                  <p className="text-xs text-gray-500 mt-1 font-medium">{role.description}</p>
-                  <p className="text-[10px] font-bold text-gray-400 mt-2 uppercase">
-                    {role.filled_quantity} / {role.quantity} preenchidas
+                  <h3 className="text-sm font-black text-gray-900 uppercase tracking-tight">{role.name}</h3>
+                  <p className="text-xs text-gray-500 mt-1 font-medium">{role.explanation}</p>
+                  <p className="text-[10px] font-bold mt-2 uppercase">
+                    {role.is_filled ? (
+                      <span className="text-green-600 bg-green-100 px-2 py-1 rounded">
+                        Preenchida por {role.maker_user_name || "Usuário"}
+                      </span>
+                    ) : (
+                      <span className="text-amber-500 bg-amber-50 px-2 py-1 rounded">
+                        Vaga Aberta
+                      </span>
+                    )}
                   </p>
                 </div>
                 
                 <div className="flex gap-2">
-                  {role.filled_quantity < role.quantity && (
+                  {!role.is_filled && (
                     <button 
-                      onClick={() => handleAction(() => projectService.fillRole(token, project.project_id, role.role_id, currentUser.user_id), 'Você assumiu a vaga.')}
+                      onClick={() => handleAction(() => projectService.fillRole(token, project.project_id, role.id, currentUser.user_id), 'Você assumiu a vaga.')}
                       className="px-4 py-2 bg-[#FFA900] text-white font-black text-[10px] uppercase tracking-widest rounded-xl shadow-md hover:bg-black transition-colors"
                     >
                       Assumir Vaga
                     </button>
                   )}
-                  {/* Se o usuário atual está ocupando uma das vagas (precisaríamos saber os filled roles específicos por usuário para ser perfeito, mas vamos simplificar a UI) */}
-                  <button 
-                    onClick={() => handleAction(() => projectService.leaveRole(token, project.project_id, role.role_id, currentUser.user_id), 'Você deixou a vaga.')}
-                    className="px-4 py-2 bg-white border border-gray-200 text-gray-600 font-black text-[10px] uppercase tracking-widest rounded-xl hover:bg-gray-100 transition-colors"
-                  >
-                    Deixar Vaga
-                  </button>
+                  {role.is_filled && role.maker_user_id === currentUser?.user_id && (
+                    <button 
+                      onClick={() => handleAction(() => projectService.leaveRole(token, project.project_id, role.id, currentUser.user_id), 'Você deixou a vaga.')}
+                      className="px-4 py-2 bg-white border border-gray-200 text-gray-600 font-black text-[10px] uppercase tracking-widest rounded-xl hover:bg-gray-100 transition-colors"
+                    >
+                      Deixar Vaga
+                    </button>
+                  )}
                 </div>
               </div>
             )) : (
@@ -146,9 +165,38 @@ const ProjectDetailScreen = () => {
             )}
           </div>
         </div>
+        </div>
+
+        {allTeamMembers.length > 0 && (
+          <div className="bg-white p-8 rounded-[2.5rem] shadow-2xl border border-gray-100 w-full lg:w-72 shrink-0 h-fit sticky top-24">
+            <h3 className="text-sm font-black text-gray-900 uppercase tracking-[0.1em] mb-6 flex items-center gap-2">
+              <Users className="h-5 w-5 text-[#FFA900]" /> Equipe
+            </h3>
+            <div className="flex flex-col gap-4">
+              {allTeamMembers.map(p => (
+                <div key={p.user_id} className="bg-gray-50 border border-gray-100 p-4 rounded-2xl flex items-center gap-4 transition-all hover:scale-[1.02] shadow-sm hover:shadow-md">
+                  <div className="h-10 w-10 bg-[#FFA900] text-white shadow-lg shadow-[#FFA900]/20 font-black text-lg flex items-center justify-center rounded-xl shrink-0">
+                    {p.name[0]}
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-sm font-black text-gray-900 block truncate">{p.name}</span>
+                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest block truncate">{p.role}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
       
-      <FeedbackModal 
+      {project.user_role && (
+        <div className="mb-12">
+          <ProjectInvites project={project} />
+          <ProjectChatSection project={project} />
+        </div>
+      )}
+      
+      <FeedbackModal  
         isOpen={feedback.open}
         type={feedback.type}
         title={feedback.title}

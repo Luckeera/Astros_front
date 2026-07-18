@@ -33,13 +33,13 @@ const Navbar = () => {
       `}</style>
       <div className="max-w-5xl mx-auto px-4 flex justify-between h-24 items-center">
         <Link 
-          to="/" 
+          to="/feed" 
           className="flex items-center gap-4 cursor-pointer group"
         >
-          <div className="p-2.5 bg-orange-50/50 rounded-2xl border border-orange-100 shadow-sm group-hover:bg-[#FFA900] transition-all duration-500 group-hover:shadow-xl group-hover:shadow-orange-200/50 overflow-hidden">
-            <OrbitIcon className="h-10 w-10 text-[#FFA900] group-hover:text-white transition-colors animate-orbit" />
+          <div className="p-2.5 bg-[#FFA900]/10 rounded-2xl border border-[#FFA900]/20 shadow-sm group-hover:bg-[#FFA900] transition-all duration-500 group-hover:shadow-xl group-hover:shadow-[#FFA900]/40 overflow-hidden">
+            <OrbitIcon className="h-10 w-10 text-[#FFA900] group-hover:text-black transition-colors animate-orbit" />
           </div>
-          <span className="text-4xl font-black text-gray-900 tracking-tighter group-hover:text-[#FFA900] transition-colors">astros</span>
+          <span className="text-4xl font-black text-gray-900 tracking-tighter group-hover:text-[#FFA900] transition-colors">astros.</span>
         </Link>
 
         <div className="hidden md:flex flex-1 justify-center px-10">

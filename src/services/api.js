@@ -151,6 +151,15 @@ export const messageService = {
     });
     if (!response.ok) throw new Error('Falha ao enviar mensagem no projeto');
     return response.json();
+  },
+
+  async getReceivedInvites(token, userId) {
+    const response = await fetch(`${API_BASE_URL}/messages/${userId}/invites/received`, {
+      method: 'POST',
+      headers: getHeaders(token),
+    });
+    if (!response.ok) throw new Error('Falha ao carregar convites');
+    return response.json();
   }
 };
 

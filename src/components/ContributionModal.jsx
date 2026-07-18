@@ -16,7 +16,7 @@ const ContributionModal = ({ post, onClose }) => {
     setSending(true);
     try {
       const chatData = await messageService.createDM(token, currentUser.user_id, post.author.user_id);
-      await messageService.sendPresentation(token, chatData.chat_id, message, post.author.user_id, post.project_id);
+      await messageService.sendPresentation(token, chatData.chat_id, message, post.author.user_id, post.post_id);
       
       setFeedback({
         open: true,
