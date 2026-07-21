@@ -40,8 +40,8 @@ export default function LandingPage() {
             <div className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#FFA900]/20 text-[#FFA900] font-black rounded-full text-sm mb-6 border border-[#FFA900]/30">
               Parte 2
             </div>
-            <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight">O Valor Institucional</h2>
-            <p className="mt-4 text-xl text-gray-400 font-medium">Fundamentação estratégica baseada nos dossiês executivos e métricas de mercado</p>
+            <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight">Para Coordenadores e Instituições</h2>
+            <p className="mt-4 text-xl text-gray-400 font-medium">Como o Astros apoia a extensão universitária, o acompanhamento pedagógico e a gestão de projetos interdisciplinares</p>
           </div>
           <div className="space-y-32">
             <FinancialROI />

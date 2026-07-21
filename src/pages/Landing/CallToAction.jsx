@@ -12,10 +12,10 @@ export default function CallToAction() {
       
       <div className="max-w-4xl mx-auto px-6 relative z-10 text-center">
         <h2 className="text-4xl md:text-6xl font-black text-white tracking-tight mb-8">
-          Pronto para liderar o futuro do Ensino Superior?
+          Conecte seu projeto a quem pode fazer ele acontecer.
         </h2>
         <p className="text-xl text-gray-300 font-medium mb-12 max-w-3xl mx-auto leading-relaxed">
-          Evite a guerra de precificação por diplomas. Posicione a sua instituição acadêmica no centro da transição para a economia do conhecimento.
+          Publique desafios reais, monte equipes com alunos de outros cursos e leve seus projetos do papel à prática — tudo dentro da plataforma Astros.
         </p>
         
         <div className="flex flex-col sm:flex-row justify-center items-center gap-6">

@@ -10,7 +10,7 @@ export default function HeroSection() {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FFA900] opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FFA900]"></span>
           </span>
-          Apresentação de Inovação Acadêmica
+          Plataforma de Colaboração Interdisciplinar
         </div>
         
         <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-tight text-gray-900 mb-8">

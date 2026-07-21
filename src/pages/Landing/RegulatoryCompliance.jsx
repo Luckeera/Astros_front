@@ -9,14 +9,14 @@ export default function RegulatoryCompliance() {
       <div className="flex flex-col lg:flex-row-reverse gap-12 items-center relative z-10">
         <div className="flex-1">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#FFA900]/20 text-[#FFA900] font-black rounded-xl text-sm mb-6 border border-[#FFA900]/30">
-            <Scale className="h-4 w-4" /> Excelência na Extensão
+            <Scale className="h-4 w-4" /> Extensão sem planilha manual
           </div>
-          <h3 className="text-3xl lg:text-4xl font-black text-white mb-6 leading-tight">Facilitação da Curricularização da Extensão.</h3>
+          <h3 className="text-3xl lg:text-4xl font-black text-white mb-6 leading-tight">Documentação automática das atividades de extensão.</h3>
           <p className="text-lg text-gray-400 font-medium mb-6 leading-relaxed">
-            A integração da extensão universitária ao currículo é um desafio pedagógico fundamental. O Astros facilita esse processo, permitindo que as atividades interdisciplinares sejam documentadas de forma fluida e integrada à jornada do aluno, fortalecendo o vínculo com a comunidade.
+            Registrar a participação dos alunos em atividades de extensão costuma significar planilha manual e relatório avulso. No Astros, cada projeto interdisciplinar já fica documentado automaticamente: quem participou, o que foi entregue e qual curso propôs o desafio.
           </p>
           <p className="text-lg text-gray-400 font-medium leading-relaxed">
-            Nossa plataforma atua como um ecossistema de colaboração: centraliza o diálogo interdisciplinar e gera portfólios de atividades. Ao invés de meras planilhas, oferecemos evidências qualitativas do engajamento estudantil, fundamentais para a valorização institucional e excelência acadêmica.
+            Toda a conversa entre os cursos, as entregas e o histórico do projeto ficam registrados na própria plataforma, prontos para virar relatório sempre que a coordenação precisar.
           </p>
         </div>
         
@@ -37,7 +37,7 @@ export default function RegulatoryCompliance() {
             </div>
             <div>
               <h4 className="font-bold text-xl text-white mb-1">Relatórios de Impacto</h4>
-              <p className="text-gray-400 font-medium">Visibilidade clara da interdisciplinaridade e do impacto social gerado pelos projetos.</p>
+              <p className="text-gray-400 font-medium">Visão clara de quais cursos colaboraram, em quais projetos e com que resultado.</p>
             </div>
           </div>
         </div>

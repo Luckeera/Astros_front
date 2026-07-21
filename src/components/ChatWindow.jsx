@@ -163,15 +163,23 @@ const ChatWindow = ({ isOpen, onClose }) => {
                 messages.map(msg => (
                   <div key={msg.message_id} className={`flex flex-col ${msg.sender_id === currentUser?.user_id ? 'items-end' : 'items-start'}`}>
                     <div className={`max-w-[85%] px-5 py-3 text-xs font-bold ${
-                      msg.is_invite 
-                        ? 'bg-amber-100 text-amber-900 rounded-2xl border-2 border-amber-300 shadow-sm'
-                        : msg.sender_id === currentUser?.user_id 
-                          ? 'bg-gray-900 text-white rounded-2xl rounded-tr-none shadow-sm' 
+                      msg.is_invite
+                        ? msg.status === 'accepted'
+                          ? 'bg-green-50 text-green-900 rounded-2xl border-2 border-green-200 shadow-sm opacity-70'
+                          : msg.status === 'rejected'
+                            ? 'bg-gray-100 text-gray-500 rounded-2xl border-2 border-gray-200 shadow-sm opacity-70'
+                            : 'bg-amber-100 text-amber-900 rounded-2xl border-2 border-amber-300 shadow-sm'
+                        : msg.sender_id === currentUser?.user_id
+                          ? 'bg-gray-900 text-white rounded-2xl rounded-tr-none shadow-sm'
                           : 'bg-white text-gray-800 rounded-2xl rounded-tl-none border border-gray-100 shadow-sm'
                     }`}>
-                      {msg.is_invite && <p className="text-[10px] font-black uppercase mb-1">💌 Convite de Projeto</p>}
+                      {msg.is_invite && (
+                        <p className="text-[10px] font-black uppercase mb-1">
+                          {msg.status === 'accepted' ? '✅ Convite Aceito' : msg.status === 'rejected' ? '🚫 Convite Recusado' : '💌 Convite de Projeto'}
+                        </p>
+                      )}
                       {msg.content}
-                      {msg.is_invite && msg.sender_id !== currentUser?.user_id && (
+                      {msg.is_invite && msg.status === 'pending' && msg.sender_id !== currentUser?.user_id && (
                         <div className="flex gap-2 mt-3">
                           <button onClick={() => handleInviteAction(msg, 'accept')} className="bg-green-500 text-white p-1.5 rounded-lg flex-1 flex justify-center hover:bg-green-600"><Check className="w-4 h-4" /></button>
                           <button onClick={() => handleInviteAction(msg, 'reject')} className="bg-red-500 text-white p-1.5 rounded-lg flex-1 flex justify-center hover:bg-red-600"><XIcon className="w-4 h-4" /></button>
