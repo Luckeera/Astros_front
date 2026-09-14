@@ -17,7 +17,7 @@ const TheProblem = () => {
             </div>
             <h4 className="text-2xl font-black text-gray-900 mb-4">Desafio da Permanência</h4>
             <p className="text-gray-500 font-medium leading-relaxed">
-              A desmotivação acadêmica é um dos principais fatores de evasão. O aluno busca propósito e conexão entre a teoria e o impacto real na sociedade.
+              A Astros cria condições para a instituição testar se a participação em projetos está associada a maior engajamento e permanência estudantil.
             </p>
           </div>
           
@@ -37,7 +37,7 @@ const TheProblem = () => {
             </div>
             <h4 className="text-2xl font-black text-gray-900 mb-4">Silos de Conhecimento</h4>
             <p className="text-gray-500 font-medium leading-relaxed">
-              Alunos de Direito, Saúde e Negócios têm problemas. Alunos de Tecnologia têm ferramentas. Eles apenas não possuem um canal de conexão.
+              A Astros propõe conectar desafios trazidos por estudantes de Direito, Saúde e Negócios às competências de estudantes de Tecnologia.
             </p>
           </div>
         </div>
@@ -46,7 +46,7 @@ const TheProblem = () => {
           <div className="flex-1">
             <p className="text-amber-400 font-black uppercase tracking-widest text-xs mb-4 italic">Insight da Pesquisa Astros:</p>
             <blockquote className="text-2xl md:text-3xl font-black italic leading-tight">
-              "Mais de 80% dos alunos entrevistados desejam inovar, mas dão nota 5/5 para a dificuldade de encontrar parceiros de outros cursos."
+              “74% (26/35) dos respondentes já quiseram iniciar ou participar de projetos. Entre as 34 respostas válidas, metade avaliou com notas 4 ou 5 a dificuldade de encontrar parceiros de outros cursos.”
             </blockquote>
           </div>
           <div className="h-24 w-24 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-md">

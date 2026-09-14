@@ -27,7 +27,7 @@ const InstitutionalROI = () => {
             </div>
             <h4 className="text-xl font-black mb-4">Permanência Estudantil</h4>
             <p className="text-gray-400 font-medium leading-relaxed">
-              Aumente o senso de pertencimento e aplicação prática. O aluno que constrói algo real fortalece seu vínculo com a instituição e com sua carreira.
+              Crie dados e condições para testar se a participação em projetos está associada a maior engajamento e permanência estudantil.
             </p>
           </div>
 
@@ -37,7 +37,7 @@ const InstitutionalROI = () => {
             </div>
             <h4 className="text-xl font-black mb-4">Prestígio e Inovação</h4>
             <p className="text-gray-400 font-medium leading-relaxed">
-              Fortaleça a imagem da instituição como um centro de inovação e excelência, atraindo parcerias estratégicas e visibilidade acadêmica.
+              Use os registros dos projetos para apresentar iniciativas de inovação e apoiar a busca por parcerias e visibilidade acadêmica.
             </p>
           </div>
         </div>

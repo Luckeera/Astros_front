@@ -5,17 +5,17 @@ export default function RequestedFeatures() {
   const features = [
     {
       title: "Busca de Habilidades",
-      description: "Mapeamento específico de parceiros via filtros de hard e soft skills (Ex: Conhecimento Jurídico, Design UX).",
+      description: "Busca de parceiros por habilidades e disponibilidade, tema presente em 8 de 30 respostas abertas válidas.",
       icon: Search
     },
     {
       title: "Portfólio Colaborativo",
-      description: "Uma vitrine para expor o andamento dos projetos interativos e o currículo/perfil de cada integrante.",
+      description: "Uma vitrine para acompanhar papéis, marcos e andamento dos projetos, além do perfil de cada integrante.",
       icon: Briefcase
     },
     {
       title: "Chat Integrado",
-      description: "Comunicação nativa e dedicada. Citada por quase todos como essencial para criar e debater demandas.",
+      description: "Tema mais citado espontaneamente: 12 de 30 respostas válidas. Apoia a comunicação assíncrona e o alinhamento das entregas.",
       icon: MessageCircle
     },
     {
@@ -29,7 +29,7 @@ export default function RequestedFeatures() {
     <div className="mt-12">
       <div className="text-center max-w-2xl mx-auto mb-12">
         <h3 className="text-3xl font-black text-gray-900 mb-4">O que os alunos pediram</h3>
-        <p className="text-gray-600 font-medium">As 4 funcionalidades classificadas como indispensáveis na Pesquisa de Colaboração para viabilizar projetos reais.</p>
+        <p className="text-gray-600 font-medium">Os quatro temas mais recorrentes nas 30 respostas abertas válidas da Pesquisa de Colaboração. A classificação temática foi feita manualmente e permite mais de um tema por resposta.</p>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">

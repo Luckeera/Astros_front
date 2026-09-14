@@ -6,7 +6,7 @@ export default function EmployabilityEdge() {
     <div className="pt-12">
       <div className="text-center">
         <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#FFA900]/20 text-[#FFA900] font-black rounded-xl text-sm mb-6 border border-[#FFA900]/30">
-          <Building2 className="h-4 w-4" /> O que você ganha no processo
+          <Building2 className="h-4 w-4" /> O que a proposta busca proporcionar
         </div>
         <h3 className="text-3xl lg:text-4xl font-black text-white mb-6 max-w-3xl mx-auto leading-tight">Aprender fazendo, com gente de fora da sua bolha.</h3>
         <p className="text-lg text-gray-400 font-medium mb-16 max-w-4xl mx-auto leading-relaxed">
@@ -20,7 +20,7 @@ export default function EmployabilityEdge() {
             </div>
             <h4 className="text-2xl font-black text-gray-900 mb-4">Projeto com dono real</h4>
             <p className="text-gray-600 font-medium leading-relaxed">
-              O desafio parte de um problema que outro curso está realmente enfrentando, não de um enunciado hipotético inventado em sala de aula.
+              A proposta é partir de um problema apresentado por outro curso, em vez de limitar o projeto a um enunciado hipotético de sala de aula.
             </p>
           </div>
           
@@ -30,7 +30,7 @@ export default function EmployabilityEdge() {
             </div>
             <h4 className="text-2xl font-black text-gray-900 mb-4">Contato com quem pensa diferente</h4>
             <p className="text-gray-600 font-medium leading-relaxed">
-              Tecnologia aprende a ouvir o problema antes de sair codando; os outros cursos ganham repertório técnico. As duas partes saem do projeto sabendo mais.
+              O formato busca ampliar a escuta do problema pela equipe de Tecnologia e a troca de repertório técnico entre os cursos.
             </p>
           </div>
           
@@ -40,7 +40,7 @@ export default function EmployabilityEdge() {
             </div>
             <h4 className="text-2xl font-black text-gray-900 mb-4">Portfólio de verdade</h4>
             <p className="text-gray-600 font-medium leading-relaxed">
-              Ao final, você sai com um projeto real no portfólio — não um exercício de sala que fica esquecido depois da nota.
+              A proposta permite registrar entregas e aprendizados em um portfólio colaborativo ao longo do projeto.
             </p>
           </div>
         </div>

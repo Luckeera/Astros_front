@@ -11,12 +11,12 @@ export default function RegulatoryCompliance() {
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#FFA900]/20 text-[#FFA900] font-black rounded-xl text-sm mb-6 border border-[#FFA900]/30">
             <Scale className="h-4 w-4" /> Extensão sem planilha manual
           </div>
-          <h3 className="text-3xl lg:text-4xl font-black text-white mb-6 leading-tight">Documentação automática das atividades de extensão.</h3>
+          <h3 className="text-3xl lg:text-4xl font-black text-white mb-6 leading-tight">Uma proposta para centralizar as atividades de extensão.</h3>
           <p className="text-lg text-gray-400 font-medium mb-6 leading-relaxed">
-            Registrar a participação dos alunos em atividades de extensão costuma significar planilha manual e relatório avulso. No Astros, cada projeto interdisciplinar já fica documentado automaticamente: quem participou, o que foi entregue e qual curso propôs o desafio.
+            Registrar a participação dos alunos em atividades de extensão costuma significar planilha manual e relatório avulso. A Astros propõe documentar cada projeto interdisciplinar: quem participou, o que foi entregue e qual curso propôs o desafio.
           </p>
           <p className="text-lg text-gray-400 font-medium leading-relaxed">
-            Toda a conversa entre os cursos, as entregas e o histórico do projeto ficam registrados na própria plataforma, prontos para virar relatório sempre que a coordenação precisar.
+            A capacidade proposta reúne conversas, entregas e o histórico do projeto na plataforma para apoiar os relatórios da coordenação.
           </p>
         </div>
         

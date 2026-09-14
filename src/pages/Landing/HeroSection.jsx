@@ -25,7 +25,7 @@ export default function HeroSection() {
           <div className="p-8 rounded-3xl border-2 border-gray-100 bg-white shadow-sm hover:border-[#FFA900]/30 hover:shadow-lg transition-all group">
             <TrendingUp className="h-10 w-10 text-[#FFA900] mb-6 group-hover:-translate-y-1 transition-transform" />
             <h3 className="font-bold text-lg text-gray-900 mb-3">Permanência e Engajamento</h3>
-            <p className="text-gray-600 font-medium leading-relaxed">Promova o protagonismo estudantil e combata a desmotivação através de projetos práticos e reais.</p>
+            <p className="text-gray-600 font-medium leading-relaxed">Crie condições para testar se a participação em projetos práticos está associada a maior engajamento e permanência.</p>
           </div>
           <div className="p-8 rounded-3xl border-2 border-gray-100 bg-white shadow-sm hover:border-[#FFA900]/30 hover:shadow-lg transition-all group">
             <ShieldCheck className="h-10 w-10 text-[#FFA900] mb-6 group-hover:-translate-y-1 transition-transform" />
@@ -35,7 +35,7 @@ export default function HeroSection() {
           <div className="p-8 rounded-3xl border-2 border-gray-100 bg-white shadow-sm hover:border-[#FFA900]/30 hover:shadow-lg transition-all group">
             <Users className="h-10 w-10 text-[#FFA900] mb-6 group-hover:-translate-y-1 transition-transform" />
             <h3 className="font-bold text-lg text-gray-900 mb-3">Skill Gap WEF</h3>
-            <p className="text-gray-600 font-medium leading-relaxed">Desenvolva habilidades vitais (soft e hard skills) exigidas pelo mercado de trabalho.</p>
+            <p className="text-gray-600 font-medium leading-relaxed">Ofereça oportunidades para praticar habilidades técnicas e interpessoais em projetos interdisciplinares.</p>
           </div>
         </div>
       </div>

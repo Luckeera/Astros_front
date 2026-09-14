@@ -10,7 +10,7 @@ export default function TheBarrier() {
           <div className="flex-1">
             <h3 className="text-3xl lg:text-4xl font-black mb-6 leading-tight">O Obstáculo: O isolamento departamental.</h3>
             <p className="text-lg text-gray-300 font-medium mb-8 leading-relaxed">
-              Quando questionados sobre a dificuldade de encontrar parceiros de outros cursos para projetos, a esmagadora maioria dos estudantes da pesquisa atribuiu as notas máximas de dificuldade (4 e 5).
+              Metade dos respondentes válidos (17/34) atribuiu notas 4 ou 5 à dificuldade de encontrar parceiros de outros cursos; a média foi 3,50/5.
             </p>
             
             <div className="bg-white/10 p-8 rounded-3xl border border-[#FFA900]/30 backdrop-blur-sm relative overflow-hidden">
@@ -18,9 +18,9 @@ export default function TheBarrier() {
               <div className="flex items-start gap-5 relative z-10">
                 <AlertOctagon className="h-12 w-12 text-[#FFA900] flex-shrink-0" />
                 <div>
-                  <h4 className="font-bold text-xl mb-3 text-white">A Principal Barreira</h4>
+                  <h4 className="font-bold text-xl mb-3 text-white">As barreiras mais relevantes</h4>
                   <p className="text-gray-300 font-medium leading-relaxed">
-                    A <strong className="text-[#FFA900]">"Falta de um canal ou plataforma de conexão"</strong> foi classificada como a dificuldade <strong>Número 1</strong> (A mais difícil de transpor), superando diferenças de horários ou linguagens técnicas.
+                    A maior barreira é conciliar horários: <strong className="text-[#FFA900]">90% (27/30)</strong> colocaram disponibilidade entre as duas dificuldades mais importantes. Canal de conexão e clareza de papéis também aparecem no top 2 de <strong className="text-[#FFA900]">63% das respostas</strong>.
                   </p>
                 </div>
               </div>
@@ -29,8 +29,8 @@ export default function TheBarrier() {
           
           <div className="flex-1 w-full flex justify-center py-10 md:py-0">
              <div className="w-64 h-64 md:w-80 md:h-80 rounded-full border-[16px] border-[#FFA900] flex items-center justify-center flex-col shadow-[0_0_80px_rgba(255,169,0,0.3)] bg-gray-900 relative">
-                <span className="text-7xl md:text-8xl font-black text-white tracking-tighter">Nº 1</span>
-                <span className="text-sm md:text-base font-bold text-gray-400 mt-2 text-center px-8">Obstáculo apontado pelos universitários</span>
+                <span className="text-7xl md:text-8xl font-black text-white tracking-tighter">90%</span>
+                <span className="text-sm md:text-base font-bold text-gray-400 mt-2 text-center px-8">colocaram disponibilidade no top 2 (27/30)</span>
              </div>
           </div>
         </div>
