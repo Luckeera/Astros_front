@@ -12,20 +12,29 @@ const FeedScreen = ({ onNavigateToDetail }) => {
   const [loading, setLoading] = useState(true);
   const { user, token } = useAuth();
   
+  const fetchPosts = async () => {
+    setLoading(true);
+    try {
+      const data = await postService.getFeed(token, user.course_id, filter);
+      setPosts(Array.isArray(data) ? data : []);
+    } catch (err) { 
+      console.error('Fetch error:', err); 
+      setPosts([]);
+    } finally { 
+      setLoading(false); 
+    }
+  };
+
   useEffect(() => {
-    const fetchPosts = async () => {
-      setLoading(true);
-      try {
-        const data = await postService.getFeed(token, user.course_id, filter);
-        setPosts(Array.isArray(data) ? data : []);
-      } catch (err) { 
-        console.error('Fetch error:', err); 
-        setPosts([]);
-      } finally { 
-        setLoading(false); 
-      }
-    };
     fetchPosts();
+  }, [filter, user, token]);
+
+  useEffect(() => {
+    const handlePostCreated = () => {
+      fetchPosts();
+    };
+    window.addEventListener('post-created', handlePostCreated);
+    return () => window.removeEventListener('post-created', handlePostCreated);
   }, [filter, user, token]);
 
   return (

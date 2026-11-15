@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, Heart, MessageSquare } from 'lucide-react';
+import { Sparkles, Heart, MessageSquare, FileText } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { postService } from '../services/api';
 import ContributionModal from './ContributionModal';
@@ -76,6 +76,22 @@ const PostCard = ({ post, onNavigateToDetail }) => {
             {new Date(post.created_at).toLocaleDateString()}
           </span>
         </div>
+
+        {post.project_id && (
+          <div 
+            data-testid="post-project-doc-badge"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/projects/${post.project_id}?tab=docs`);
+            }}
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-amber-50 hover:bg-[#FFA900] text-gray-900 border border-[#FFA900]/40 text-xs font-black transition-all cursor-pointer shadow-sm group/proj mb-4"
+            title="Ver documentação do projeto"
+          >
+            <FileText className="h-3.5 w-3.5 text-[#FFA900] group-hover/proj:text-black transition-colors" />
+            <span>Projeto: {post.project_name || 'Ver Documentação'}</span>
+            <span className="text-[10px] text-gray-500 group-hover/proj:text-black transition-colors font-bold">Documentação Oficial →</span>
+          </div>
+        )}
 
         <h3 className="font-black text-2xl mb-3 text-gray-900 tracking-tight leading-tight group-hover:text-[#FFA900] transition-colors">{post.title}</h3>
         <p className="text-gray-500 text-sm leading-relaxed mb-10 font-medium line-clamp-3">{post.content}</p>

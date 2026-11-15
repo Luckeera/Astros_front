@@ -4,6 +4,7 @@ import { MessageSquare, Plus } from 'lucide-react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import ChatWindow from './components/ChatWindow';
+import CreatePostModal from './components/CreatePostModal';
 import FeedScreen from './pages/FeedScreen';
 import ProfileScreen from './pages/ProfileScreen';
 import UserProfileScreen from './pages/UserProfileScreen';
@@ -14,11 +15,15 @@ import LandingPage from './pages/Landing/LandingPage';
 import ProjectDashboardScreen from './pages/ProjectDashboardScreen';
 import ProjectCreationScreen from './pages/ProjectCreationScreen';
 import ProjectDetailScreen from './pages/ProjectDetailScreen';
+import MuralScreen from './pages/MuralScreen';
+import InterviewScreen from './pages/InterviewScreen';
+import LandingNavbar from './pages/Landing/LandingNavbar';
 
 // Componente para proteger rotas e aplicar o Layout do App
 const AppLayout = ({ children }) => {
   const { user, loading } = useAuth();
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
   const [hasNewActivity, setHasNewActivity] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -31,15 +36,26 @@ const AppLayout = ({ children }) => {
     const handleNewActivity = () => {
       if (!isChatOpen) setHasNewActivity(true);
     };
+    const handleOpenCreatePost = () => {
+      setIsCreatePostOpen(true);
+    };
     
     window.addEventListener('open-chat', handleOpenChat);
     window.addEventListener('chat-activity', handleNewActivity);
+    window.addEventListener('open-create-post', handleOpenCreatePost);
+
+    // Se a URL possuir ?create=true, abre o modal de criação de post
+    const searchParams = new URLSearchParams(location.search);
+    if (searchParams.get('create') === 'true') {
+      setIsCreatePostOpen(true);
+    }
     
     return () => {
       window.removeEventListener('open-chat', handleOpenChat);
       window.removeEventListener('chat-activity', handleNewActivity);
+      window.removeEventListener('open-create-post', handleOpenCreatePost);
     };
-  }, [isChatOpen]);
+  }, [isChatOpen, location.search]);
 
   if (loading) return null; // O AuthProvider já trata o loading global
   
@@ -56,6 +72,7 @@ const AppLayout = ({ children }) => {
       </main>
       
       <ChatWindow isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
+      <CreatePostModal isOpen={isCreatePostOpen} onClose={() => setIsCreatePostOpen(false)} />
 
       <div className="fixed bottom-10 right-10 flex flex-col gap-6 z-[90]">
         {!isChatOpen && (
@@ -73,8 +90,9 @@ const AppLayout = ({ children }) => {
           </button>
         )}
         <button 
-          onClick={() => navigate('/create')}
+          onClick={() => setIsCreatePostOpen(true)}
           className="h-20 w-20 bg-[#FFA900] text-black rounded-3xl shadow-[0_20px_50px_rgba(255,169,0,0.3)] flex items-center justify-center hover:scale-110 active:scale-95 transition-all group hover:bg-gray-900 hover:text-white border-4 border-white"
+          title="Nova Publicação"
         >
           <Plus className="h-10 w-10 group-hover:rotate-90 transition-transform" />
         </button>
@@ -96,6 +114,27 @@ const AppRoutes = () => {
     <Routes>
       {/* Rota Raiz: Landing Page B2B */}
       <Route path="/" element={<LandingPage />} />
+      
+      {/* Rota Pública: Entrevista / Pesquisa Guiada com Mural Embutido */}
+      <Route path="/entrevista" element={<InterviewScreen />} />
+      <Route path="/pesquisa" element={<Navigate to="/entrevista" replace />} />
+
+      {/* Rota Pública / Degustação: Mural de Projetos */}
+      <Route 
+        path="/mural" 
+        element={
+          user ? (
+            <AppLayout>
+              <MuralScreen />
+            </AppLayout>
+          ) : (
+            <div className="min-h-screen bg-[#FDFDFD]">
+              <Navbar />
+              <MuralScreen />
+            </div>
+          )
+        } 
+      />
       
       {/* Rota de Login */}
       <Route 
@@ -131,9 +170,7 @@ const AppRoutes = () => {
       } />
       
       <Route path="/create" element={
-        <AppLayout>
-          <CreatePostScreen onCancel={() => navigate('/feed')} />
-        </AppLayout>
+        <Navigate to="/feed?create=true" replace />
       } />
 
       <Route path="/projects" element={
@@ -143,16 +180,24 @@ const AppRoutes = () => {
       } />
 
       <Route path="/projects/create" element={
-        <AppLayout>
-          <ProjectCreationScreen />
-        </AppLayout>
+        <Navigate to="/projects?create=true" replace />
       } />
 
-      <Route path="/projects/:projectId" element={
-        <AppLayout>
-          <ProjectDetailScreen />
-        </AppLayout>
-      } />
+      <Route 
+        path="/projects/:projectId" 
+        element={
+          user ? (
+            <AppLayout>
+              <ProjectDetailScreen />
+            </AppLayout>
+          ) : (
+            <div className="min-h-screen bg-[#FDFDFD]">
+              <Navbar />
+              <ProjectDetailScreen />
+            </div>
+          )
+        } 
+      />
 
       {/* Redirecionamento de segurança */}
       <Route path="*" element={<Navigate to="/" replace />} />

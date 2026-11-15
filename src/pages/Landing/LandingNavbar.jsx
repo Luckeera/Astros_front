@@ -24,7 +24,14 @@ export default function LandingNavbar() {
           <span className="text-3xl font-black tracking-tighter text-gray-900 group-hover:text-[#FFA900] transition-colors">astros.</span>
         </div>
         
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={() => navigate('/mural')}
+            className="px-4 md:px-5 py-2.5 text-sm font-black text-gray-800 hover:text-[#FFA900] transition-colors rounded-xl hover:bg-gray-50 flex items-center gap-2"
+          >
+            <span>Mural de Projetos</span>
+            <span className="h-2 w-2 rounded-full bg-[#FFA900] animate-pulse"></span>
+          </button>
           <button 
             onClick={() => navigate('/login')}
             className="px-6 md:px-8 py-3 bg-[#FFA900] text-black text-sm font-black rounded-xl hover:bg-gray-900 hover:text-white transition-all shadow-xl hover:shadow-[#FFA900]/40 hover:-translate-y-1"

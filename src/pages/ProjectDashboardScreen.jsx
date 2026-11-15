@@ -1,14 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { projectService } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { Briefcase, Plus, ChevronRight, User } from 'lucide-react';
+import CreateProjectModal from '../components/CreateProjectModal';
 
 const ProjectDashboardScreen = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const { token, user: currentUser } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get('create') === 'true') {
+      setIsCreateModalOpen(true);
+      // Limpa o searchParam da URL sem recarregar a página
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   useEffect(() => {
     loadProjects();
@@ -26,6 +37,13 @@ const ProjectDashboardScreen = () => {
     }
   };
 
+  const handleProjectCreated = (newProject) => {
+    loadProjects();
+    if (newProject?.project_id) {
+      navigate(`/projects/${newProject.project_id}`);
+    }
+  };
+
   return (
     <div className="max-w-3xl mx-auto px-6 pt-32 pb-40">
       <div className="flex justify-between items-center mb-10">
@@ -34,8 +52,8 @@ const ProjectDashboardScreen = () => {
           <p className="text-gray-500 font-bold max-w-xl">Gerencie seus projetos acadêmicos e acompanhe suas colaborações.</p>
         </div>
         <button 
-          onClick={() => navigate('/projects/create')}
-          className="bg-gray-900 text-white font-black px-6 py-4 rounded-2xl shadow-xl shadow-gray-200 uppercase tracking-widest text-xs flex items-center gap-3 hover:bg-[#FFA900] transition-colors"
+          onClick={() => setIsCreateModalOpen(true)}
+          className="bg-gray-900 text-white font-black px-6 py-4 rounded-2xl shadow-xl shadow-gray-200 uppercase tracking-widest text-xs flex items-center gap-3 hover:bg-[#FFA900] hover:text-black transition-colors"
         >
           <Plus className="h-5 w-5" />
           Novo Projeto
@@ -87,6 +105,11 @@ const ProjectDashboardScreen = () => {
           <p className="text-gray-500 font-medium">Você ainda não está participando de nenhum projeto.</p>
         </div>
       )}
+      <CreateProjectModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onProjectCreated={handleProjectCreated}
+      />
     </div>
   );
 };

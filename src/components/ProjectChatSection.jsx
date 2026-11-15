@@ -8,10 +8,15 @@ const ProjectChatSection = ({ project }) => {
   const [msgInput, setMsgInput] = useState('');
   const [loading, setLoading] = useState(true);
   const { token, user: currentUser } = useAuth();
-  const messagesEndRef = useRef(null);
+  const chatContainerRef = useRef(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  const scrollToBottom = (behavior = 'auto') => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior: behavior
+      });
+    }
   };
 
   const loadMessages = async (silent = false) => {
@@ -21,7 +26,7 @@ const ProjectChatSection = ({ project }) => {
       setMessages(prev => {
         const newMsgs = data.messages || data || [];
         if (prev.length !== newMsgs.length) {
-          setTimeout(scrollToBottom, 100);
+          setTimeout(() => scrollToBottom('auto'), 50);
           return newMsgs;
         }
         return prev;
@@ -45,7 +50,7 @@ const ProjectChatSection = ({ project }) => {
   }, [project.chat_id, token, project.project_id]);
 
   useEffect(() => {
-    scrollToBottom();
+    scrollToBottom('auto');
   }, [messages]);
 
   const handleSendMessage = async () => {
@@ -54,7 +59,7 @@ const ProjectChatSection = ({ project }) => {
       const newMessage = await messageService.sendProjectMessage(token, project.project_id, project.chat_id, msgInput);
       setMessages(prev => [...prev, newMessage]);
       setMsgInput('');
-      scrollToBottom();
+      setTimeout(() => scrollToBottom('smooth'), 50);
     } catch (err) {
       console.error('Erro ao enviar mensagem:', err);
     }
@@ -80,7 +85,10 @@ const ProjectChatSection = ({ project }) => {
         </div>
       </div>
       
-      <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50/30">
+      <div 
+        ref={chatContainerRef}
+        className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50/30"
+      >
         {loading && messages.length === 0 ? (
           <div className="h-full flex items-center justify-center">
             <div className="w-8 h-8 border-4 border-[#FFA900]/20 border-t-[#FFA900] rounded-full animate-spin" />
@@ -109,7 +117,6 @@ const ProjectChatSection = ({ project }) => {
             <p className="text-xs font-black text-gray-400 uppercase tracking-widest leading-relaxed">Nenhuma mensagem ainda.</p>
           </div>
         )}
-        <div ref={messagesEndRef} />
       </div>
       
       <div className="p-4 bg-white border-t border-gray-100 flex gap-2 items-center">

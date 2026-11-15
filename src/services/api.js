@@ -173,10 +173,37 @@ export const projectService = {
   },
 
   async getProjectDetails(token, projectId) {
+    const headers = token ? getHeaders(token) : { 'Content-Type': 'application/json' };
     const response = await fetch(`${API_BASE_URL}/projects/${projectId}`, {
-      headers: getHeaders(token),
+      headers,
     });
     if (!response.ok) throw new Error('Falha ao carregar detalhes do projeto');
+    return response.json();
+  },
+
+  async updateDocumentation(token, projectId, documentation) {
+    const response = await fetch(`${API_BASE_URL}/projects/${projectId}/documentation`, {
+      method: 'PUT',
+      headers: getHeaders(token),
+      body: JSON.stringify({ documentation }),
+    });
+    if (!response.ok) throw new Error('Falha ao atualizar documentação do projeto');
+    return response.json();
+  },
+
+  async addProjectUpdate(token, projectId, updateData) {
+    const response = await fetch(`${API_BASE_URL}/projects/${projectId}/updates`, {
+      method: 'POST',
+      headers: getHeaders(token),
+      body: JSON.stringify(updateData),
+    });
+    if (!response.ok) throw new Error('Falha ao registrar atualização');
+    return response.json();
+  },
+
+  async getProjectUpdates(projectId) {
+    const response = await fetch(`${API_BASE_URL}/projects/${projectId}/updates`);
+    if (!response.ok) throw new Error('Falha ao carregar histórico de atualizações');
     return response.json();
   },
 
@@ -195,6 +222,14 @@ export const projectService = {
       headers: getHeaders(token),
     });
     if (!response.ok) throw new Error('Falha ao rejeitar convite');
+    return response.json();
+  },
+
+  async getMuralProjects(token) {
+    const response = await fetch(`${API_BASE_URL}/projects/mural`, {
+      headers: getHeaders(token),
+    });
+    if (!response.ok) throw new Error('Falha ao carregar projetos do mural');
     return response.json();
   },
 
@@ -244,6 +279,35 @@ export const projectService = {
     return response.json();
   },
 
+  async updateProjectInfo(token, projectId, info) {
+    const response = await fetch(`${API_BASE_URL}/projects/${projectId}/info`, {
+      method: 'PATCH',
+      headers: getHeaders(token),
+      body: JSON.stringify(info),
+    });
+    if (!response.ok) throw new Error('Falha ao atualizar informações do projeto');
+    return response.json();
+  },
+
+  async addProjectRole(token, projectId, roleData) {
+    const response = await fetch(`${API_BASE_URL}/projects/${projectId}/roles`, {
+      method: 'POST',
+      headers: getHeaders(token),
+      body: JSON.stringify(roleData),
+    });
+    if (!response.ok) throw new Error('Falha ao adicionar vaga ao projeto');
+    return response.json();
+  },
+
+  async deleteProjectRole(token, projectId, roleId) {
+    const response = await fetch(`${API_BASE_URL}/projects/${projectId}/roles/${roleId}`, {
+      method: 'DELETE',
+      headers: getHeaders(token),
+    });
+    if (!response.ok) throw new Error('Falha ao remover vaga');
+    return response.json();
+  },
+
   async leaveProject(token, projectId) {
     const response = await fetch(`${API_BASE_URL}/projects/leave_project/${projectId}`, {
       method: 'DELETE',
@@ -255,6 +319,19 @@ export const projectService = {
 };
 
 export const userService = {
+  async register(userData) {
+    const response = await fetch(`${API_BASE_URL}/users/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userData),
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.detail || 'Falha ao realizar cadastro.');
+    }
+    return response.json();
+  },
+
   async getProfile(token, userId) {
     const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
       headers: getHeaders(token),
@@ -272,3 +349,27 @@ export const courseService = {
     return response.json();
   }
 };
+
+export const interviewService = {
+  async submitInterview(interviewData) {
+    const response = await fetch(`${API_BASE_URL}/interviews/submit`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(interviewData),
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.detail || 'Falha ao registrar entrevista.');
+    }
+    return response.json();
+  },
+
+  async getInterviews(token) {
+    const response = await fetch(`${API_BASE_URL}/interviews/`, {
+      headers: getHeaders(token),
+    });
+    if (!response.ok) throw new Error('Falha ao carregar entrevistas');
+    return response.json();
+  }
+};
+

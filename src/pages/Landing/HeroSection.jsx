@@ -3,7 +3,7 @@ import { ShieldCheck, TrendingUp, Users } from 'lucide-react';
 
 export default function HeroSection() {
   return (
-    <section className="pt-40 pb-20 px-6 max-w-6xl mx-auto">
+    <section className="pt-12 md:pt-16 pb-20 px-6 max-w-6xl mx-auto">
       <div className="text-center max-w-4xl mx-auto">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#FFA900]/10 text-[#FFA900] font-bold text-sm mb-8 border border-[#FFA900]/20">
           <span className="relative flex h-2 w-2">

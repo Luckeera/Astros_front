@@ -53,13 +53,30 @@ export const AuthProvider = ({ children }) => {
     setToken(access_token);
   };
 
+  const register = async (userData) => {
+    // 1. Cria usuário via API
+    const res = await fetch(`${API_BASE_URL}/users/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userData),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw new Error(errorData.detail || 'Falha ao realizar cadastro.');
+    }
+
+    // 2. Realiza login automático imediato com e-mail e senha
+    await login(userData.email, userData.password);
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
     setToken(null);
     setUser(null);
   };
 
-  const authValue = useMemo(() => ({ user, token, login, logout, loading }), [user, token, loading]);
+  const authValue = useMemo(() => ({ user, token, login, register, logout, loading }), [user, token, loading]);
 
   if (loading) return (
     <div className="h-screen flex flex-col items-center justify-center font-bold gap-4 bg-gray-50">

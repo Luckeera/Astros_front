@@ -1,16 +1,30 @@
-import React from 'react';
-import { BookOpen, MapPin, Bell, AlertCircle, Sparkles, Users } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { BookOpen, MapPin, Sparkles, Building2, FolderGit2, ArrowRight, Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { projectService } from '../services/api';
 import OrbitIcon from '../icons/OrbitIcon';
 
 const ProfileScreen = () => {
-  const { user } = useAuth();
-  const notice = { text: "Atividade da Semana Ubíqua vence sexta às 23:59", label: "URGENTE" };
-  const collabPosts = [
-    { id: 1, title: "MVP de Software Mobile", subject: "Sistemas", desc: "Procuro Dev para integrar backend em projeto de extensão." },
-    { id: 2, title: "Grupo de Estudos Avançados em IA", subject: "IA", desc: "Preparação para a Maratona de Programação." },
-    { id: 3, title: "Protótipo UX de Saúde", subject: "Design", desc: "Voluntários para teste de usabilidade em app médico." },
-  ];
+  const { user, token } = useAuth();
+  const navigate = useNavigate();
+  const [projects, setProjects] = useState([]);
+  const [loadingProjects, setLoadingProjects] = useState(true);
+
+  useEffect(() => {
+    if (user?.user_id) {
+      setLoadingProjects(true);
+      projectService.getUserProjects(token, user.user_id)
+        .then(data => setProjects(data || []))
+        .catch(err => {
+          console.error("Erro ao carregar projetos do usuário", err);
+          setProjects([]);
+        })
+        .finally(() => setLoadingProjects(false));
+    }
+  }, [user?.user_id, token]);
+
+  if (!user) return null;
 
   return (
     <div className="max-w-4xl mx-auto py-16 px-4 sm:px-0">
@@ -20,7 +34,7 @@ const ProfileScreen = () => {
         </div>
         <div className="px-12 pb-14 relative">
           <div className="h-36 w-32 rounded-2xl border-[10px] border-white bg-gray-900 -mt-18 mb-10 shadow-2xl flex items-center justify-center text-white text-7xl font-black rotate-3 hover:rotate-0 transition-all duration-500 group cursor-help animate-in zoom-in-50">
-            <span className="group-hover:scale-110 transition-transform">{user.name[0]}</span>
+            <span className="group-hover:scale-110 transition-transform">{user.name?.[0] || '?'}</span>
           </div>
           
           <div className="flex flex-col sm:flex-row justify-between items-start gap-8 mb-12">
@@ -33,95 +47,124 @@ const ProfileScreen = () => {
                 <span className="text-gray-400 font-black text-[11px] tracking-widest uppercase border-l border-gray-200 pl-4">MATRÍCULA #{user.user_id}</span>
               </div>
             </div>
-            <button className="w-full sm:w-auto px-10 py-5 bg-gray-900 text-white border-2 border-gray-900 rounded-2xl text-[11px] font-black hover:bg-transparent hover:text-gray-900 transition-all shadow-xl uppercase tracking-[0.2em] active:scale-95">Editar Perfil</button>
+            <button className="w-full sm:w-auto px-10 py-5 bg-gray-900 text-white border-2 border-gray-900 rounded-2xl text-[11px] font-black hover:bg-transparent hover:text-gray-900 transition-all shadow-xl uppercase tracking-[0.2em] active:scale-95">
+              Editar Perfil
+            </button>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-            <div className="p-8 bg-gray-50/50 rounded-2xl border border-gray-100 group hover:border-[#FFA900]/40 transition-all hover:bg-white shadow-sm">
-              <span className="block text-[10px] font-black text-gray-400 uppercase mb-4 tracking-[0.3em]">Graduação</span>
-              <div className="flex items-center gap-5 text-lg font-black text-gray-800">
-                <div className="p-4 bg-white rounded-xl shadow-lg border border-gray-50"><BookOpen className="h-6 w-6 text-[#FFA900]" /></div>
-                {user.course?.name || "Bacharelado"}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div className="p-6 bg-gray-50/50 rounded-2xl border border-gray-100 group hover:border-[#FFA900]/40 transition-all hover:bg-white shadow-sm flex flex-col justify-between">
+              <span className="block text-[10px] font-black text-gray-400 uppercase mb-3 tracking-[0.3em]">Graduação</span>
+              <div className="flex items-center gap-4 text-base font-black text-gray-800">
+                <div className="p-3 bg-white rounded-xl shadow-md border border-gray-50 shrink-0">
+                  <BookOpen className="h-5 w-5 text-[#FFA900]" />
+                </div>
+                <span className="leading-snug">{user.course?.name || "Não informado"}</span>
               </div>
             </div>
-            <div className="p-8 bg-gray-50/50 rounded-2xl border border-gray-100 group hover:border-[#FFA900]/40 transition-all hover:bg-white shadow-sm">
-              <span className="block text-[10px] font-black text-gray-400 uppercase mb-4 tracking-[0.3em]">Jornada</span>
-              <div className="flex items-center gap-5 text-lg font-black text-gray-800">
-                <div className="p-4 bg-white rounded-xl shadow-lg border border-gray-50"><MapPin className="h-6 w-6 text-[#FFA900]" /></div>
-                {user.period}º Período
+
+            <div className="p-6 bg-gray-50/50 rounded-2xl border border-gray-100 group hover:border-[#FFA900]/40 transition-all hover:bg-white shadow-sm flex flex-col justify-between">
+              <span className="block text-[10px] font-black text-gray-400 uppercase mb-3 tracking-[0.3em]">Instituição</span>
+              <div className="flex items-center gap-4 text-base font-black text-gray-800">
+                <div className="p-3 bg-white rounded-xl shadow-md border border-gray-50 shrink-0">
+                  <Building2 className="h-5 w-5 text-[#FFA900]" />
+                </div>
+                <span className="leading-snug">{user.college?.name || "Não informada"}</span>
+              </div>
+            </div>
+
+            <div className="p-6 bg-gray-50/50 rounded-2xl border border-gray-100 group hover:border-[#FFA900]/40 transition-all hover:bg-white shadow-sm flex flex-col justify-between">
+              <span className="block text-[10px] font-black text-gray-400 uppercase mb-3 tracking-[0.3em]">Jornada</span>
+              <div className="flex items-center gap-4 text-base font-black text-gray-800">
+                <div className="p-3 bg-white rounded-xl shadow-md border border-gray-50 shrink-0">
+                  <MapPin className="h-5 w-5 text-[#FFA900]" />
+                </div>
+                <span className="leading-snug">{user.period}º Período</span>
               </div>
             </div>
           </div>
         </div>
       </div>
-
-      <section className="mb-16">
-        <div className="flex items-center justify-between mb-8 px-6">
-          <h3 className="text-2xl font-black text-gray-900 tracking-tighter flex items-center gap-4">
-            <div className="p-3 bg-gray-900 rounded-xl text-white shadow-xl shadow-gray-200"><Bell className="h-5 w-5" /></div> Mural de Avisos
-          </h3>
-        </div>
-        <div className="bg-white p-10 rounded-3xl border-l-[12px] border-[#FFA900] border-t border-r border-b border-gray-100 shadow-2xl shadow-gray-200/50 flex items-center justify-between group hover:scale-[1.03] transition-all cursor-pointer ring-1 ring-black/5">
-          <div className="flex-1">
-            <span className="text-[10px] font-black text-[#FFA900] uppercase tracking-[0.3em] mb-2 block font-sans">Alerta Prioritário</span>
-            <p className="text-gray-800 font-black text-xl tracking-tight leading-snug max-w-sm">{notice.text}</p>
-          </div>
-          <div className="h-18 w-18 bg-orange-50 rounded-2xl flex items-center justify-center border-2 border-orange-100 shadow-inner group-hover:bg-[#FFA900] transition-colors">
-            <AlertCircle className="h-8 w-8 text-[#FFA900] group-hover:text-white transition-colors" />
-          </div>
-        </div>
-      </section>
 
       <section className="mb-16">
         <div className="flex justify-between items-center mb-8 px-6">
           <h3 className="text-2xl font-black text-gray-900 tracking-tighter flex items-center gap-4">
-            <div className="p-3 bg-[#FFA900] rounded-xl text-white shadow-xl shadow-orange-100"><Sparkles className="h-5 w-5" /></div> Seus Projetos
+            <div className="p-3 bg-[#FFA900] rounded-xl text-white shadow-xl shadow-orange-100">
+              <Sparkles className="h-5 w-5" />
+            </div> 
+            Seus Projetos ({projects.length})
           </h3>
+          <button
+            onClick={() => navigate('/projects/create')}
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white rounded-xl text-xs font-black uppercase tracking-wider hover:bg-[#FFA900] hover:text-black transition-all shadow-md active:scale-95"
+          >
+            <Plus className="h-4 w-4" /> Novo Projeto
+          </button>
         </div>
-        <div className="flex gap-6 overflow-x-auto pt-8 pb-10 scrollbar-hide -mx-4 px-6 sm:mx-0 sm:px-0">
-          {collabPosts.map(post => (
-            <div key={post.id} className="min-w-[320px] bg-white p-10 rounded-3xl border border-gray-100 shadow-xl hover:shadow-3xl transition-all group hover:-translate-y-3 ring-1 ring-black/5">
-              <span className="inline-block px-5 py-2 bg-gray-50 text-gray-400 text-[10px] font-black rounded-xl mb-8 group-hover:bg-gray-900 group-hover:text-white transition-all uppercase tracking-widest border border-gray-100">
-                {post.subject}
-              </span>
-              <h4 className="text-2xl font-black text-gray-900 mb-4 tracking-tighter leading-tight group-hover:text-[#FFA900] transition-colors">{post.title}</h4>
-              <p className="text-gray-400 text-sm font-medium leading-[1.6] mb-8 line-clamp-2">{post.desc}</p>
-              <div className="flex items-center gap-3 text-[#FFA900] group-hover:translate-x-3 transition-transform">
-                <div className="p-2 bg-orange-50 rounded-xl border border-orange-100 group-hover:bg-[#FFA900] group-hover:text-white transition-all duration-500 shadow-sm">
-                  <OrbitIcon className="h-5 w-5 animate-[slowRotate_20s_linear_infinite]" />
-                </div>
-                <span className="text-[11px] font-black uppercase tracking-[0.2em]">Ver Engajamento</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
 
-      <div className="bg-white rounded-3xl border border-gray-100 p-12 shadow-2xl shadow-gray-200/50 ring-1 ring-black/5">
-        <div className="flex items-center justify-between mb-10">
-           <h3 className="text-2xl font-black text-gray-900 tracking-tighter flex items-center gap-4">
-             <div className="p-3 bg-gray-900 rounded-xl text-white shadow-xl shadow-gray-200"><Users className="h-5 w-5" /></div> Status Ativo
-           </h3>
-        </div>
-        <div className="flex flex-wrap gap-2.5">
-          {Array.from({ length: 98 }, (_, i) => {
-            const level = Math.floor(Math.random() * 4); 
-            const delay = i * 5;
-            return (
+        {loadingProjects ? (
+          <div className="bg-white rounded-3xl border border-gray-100 p-12 text-center shadow-lg">
+            <div className="w-8 h-8 border-4 border-[#FFA900]/20 border-t-[#FFA900] rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-xs font-black text-gray-400 uppercase tracking-widest">Carregando projetos...</p>
+          </div>
+        ) : projects.length === 0 ? (
+          <div className="bg-white rounded-3xl border border-gray-100 p-12 text-center shadow-xl shadow-gray-200/40 ring-1 ring-black/5">
+            <div className="h-16 w-16 bg-amber-50 rounded-2xl mx-auto flex items-center justify-center text-[#FFA900] mb-4 border border-amber-100">
+              <FolderGit2 className="h-8 w-8" />
+            </div>
+            <h4 className="text-xl font-black text-gray-900 mb-2">Você ainda não possui projetos</h4>
+            <p className="text-gray-500 text-sm max-w-md mx-auto mb-6">
+              Crie uma iniciativa ou faça parte de squads em andamento para exibir suas realizações aqui.
+            </p>
+            <button
+              onClick={() => navigate('/projects/create')}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-[#FFA900] text-black font-black text-xs uppercase tracking-widest rounded-xl hover:bg-gray-900 hover:text-white transition-all shadow-lg active:scale-95"
+            >
+              <Plus className="h-4 w-4" /> Criar Projeto
+            </button>
+          </div>
+        ) : (
+          <div className="flex gap-6 overflow-x-auto pt-4 pb-8 scrollbar-hide -mx-4 px-6 sm:mx-0 sm:px-0">
+            {projects.map(project => (
               <div 
-                key={i} 
-                style={{ animationDelay: `${delay}ms` }}
-                className={`w-5 h-5 rounded-lg transition-all duration-200 cursor-pointer shadow-sm animate-in fade-in zoom-in-50 duration-300 hover:z-20 hover:scale-[2.1] hover:rotate-[15deg] hover:shadow-2xl hover:ring-2 hover:ring-[#FFA900] ${
-                  level === 0 ? 'bg-gray-100 hover:bg-gray-200' : 
-                  level === 1 ? 'bg-orange-100 hover:bg-orange-200' : 
-                  level === 2 ? 'bg-orange-300 hover:bg-orange-500' : 
-                  'bg-[#FFA900] hover:bg-orange-600 hover:shadow-orange-200'
-                }`} 
-              />
-            );
-          })}
-        </div>
-      </div>
+                key={project.project_id}
+                onClick={() => navigate(`/projects/${project.project_id}`)}
+                className="min-w-[320px] max-w-[360px] bg-white p-8 rounded-3xl border border-gray-100 shadow-xl hover:shadow-2xl transition-all group hover:-translate-y-2 ring-1 ring-black/5 cursor-pointer flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-6">
+                    <span className={`inline-block px-4 py-1.5 text-[10px] font-black rounded-xl uppercase tracking-widest border ${
+                      project.user_role === 'Lider' 
+                        ? 'bg-[#FFA900]/10 text-amber-700 border-[#FFA900]/30' 
+                        : 'bg-gray-50 text-gray-500 border-gray-100'
+                    }`}>
+                      {project.user_role === 'Lider' ? 'Líder' : 'Participante'}
+                    </span>
+                    <span 
+                      className={`h-2.5 w-2.5 rounded-full ${project.is_active ? 'bg-emerald-500 ring-4 ring-emerald-100' : 'bg-gray-300'}`} 
+                      title={project.is_active ? 'Projeto Ativo' : 'Projeto Inativo'} 
+                    />
+                  </div>
+                  <h4 className="text-2xl font-black text-gray-900 mb-3 tracking-tighter leading-tight group-hover:text-[#FFA900] transition-colors line-clamp-2">
+                    {project.name}
+                  </h4>
+                  <p className="text-gray-400 text-sm font-medium leading-[1.6] mb-6 line-clamp-3">
+                    {project.description}
+                  </p>
+                </div>
+
+                <div className="pt-4 border-t border-gray-50 flex items-center justify-between text-[#FFA900] group-hover:translate-x-1 transition-transform">
+                  <div className="flex items-center gap-2">
+                    <OrbitIcon className="h-4 w-4 animate-[slowRotate_20s_linear_infinite]" />
+                    <span className="text-[11px] font-black uppercase tracking-[0.2em]">Ver Projeto</span>
+                  </div>
+                  <ArrowRight className="h-4 w-4" />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 };

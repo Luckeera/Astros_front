@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, MessageSquare, X, Heart } from 'lucide-react';
+import { ChevronLeft, MessageSquare, X, Heart, FileText } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { postService } from '../services/api';
@@ -125,6 +125,33 @@ const PostDetailScreen = ({ onBack }) => {
           <div className="bg-gray-50/50 p-10 rounded-3xl border border-gray-100 mb-8 shadow-inner">
             <p className="text-gray-500 text-lg leading-[1.8] font-medium whitespace-pre-wrap">{post.content}</p>
           </div>
+
+          {post.project_id && (
+            <div 
+              data-testid="post-detail-project-doc-card"
+              onClick={() => navigate(`/projects/${post.project_id}?tab=docs`)}
+              className="p-6 bg-gradient-to-r from-amber-50 to-orange-50/40 border-2 border-[#FFA900]/40 rounded-3xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer hover:border-[#FFA900] hover:shadow-xl transition-all group mb-8"
+              title="Acessar documentação oficial do projeto"
+            >
+              <div className="flex items-center gap-4">
+                <div className="p-3.5 bg-[#FFA900] text-black rounded-2xl shadow-md shadow-[#FFA900]/20 group-hover:scale-105 transition-transform">
+                  <FileText className="h-6 w-6" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-[#FFA900] block mb-1">
+                    Documentação Oficial do Projeto
+                  </span>
+                  <h4 className="text-lg font-black text-gray-900 group-hover:text-black transition-colors">
+                    {post.project_name || 'Acessar Documentação e Especificações'}
+                  </h4>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 text-xs font-black text-gray-900 group-hover:translate-x-1 transition-transform self-end sm:self-auto">
+                <span>Abrir Documentos</span>
+                <span className="text-[#FFA900]">→</span>
+              </div>
+            </div>
+          )}
 
           <div className="flex items-center gap-4 mb-14">
             <button 

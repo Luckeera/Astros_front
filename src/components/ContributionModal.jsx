@@ -9,6 +9,7 @@ const ContributionModal = ({ post, onClose }) => {
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
   const [feedback, setFeedback] = useState({ open: false, type: 'success', title: '', message: '' });
+  const [createdChatId, setCreatedChatId] = useState(null);
   const { token, user: currentUser } = useAuth();
 
   const handleSend = async () => {
@@ -16,6 +17,7 @@ const ContributionModal = ({ post, onClose }) => {
     setSending(true);
     try {
       const chatData = await messageService.createDM(token, currentUser.user_id, post.author.user_id);
+      setCreatedChatId(chatData.chat_id);
       await messageService.sendPresentation(token, chatData.chat_id, message, post.author.user_id, post.post_id);
       
       setFeedback({
@@ -52,7 +54,9 @@ const ContributionModal = ({ post, onClose }) => {
       onClose();
       // Dispara o evento para abrir o chat automaticamente, educando o usuário
       setTimeout(() => {
-        window.dispatchEvent(new CustomEvent('open-chat'));
+        window.dispatchEvent(new CustomEvent('open-chat', {
+          detail: createdChatId ? { chatId: createdChatId } : undefined
+        }));
       }, 300); // Pequeno atraso para a animação do modal fechar
     }
   };
