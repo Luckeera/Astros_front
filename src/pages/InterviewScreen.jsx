@@ -50,6 +50,16 @@ const PREDEFINED_FEATURES = [
   'Banco de ideias sugeridas para quem quer começar do zero'
 ];
 
+// Embaralha uma lista aleatoriamente (Fisher-Yates) mantendo a estabilidade após carregar
+function shuffleList(list) {
+  const shuffled = [...list];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
 export default function InterviewScreen({ embedded = false }) {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
@@ -84,13 +94,15 @@ export default function InterviewScreen({ embedded = false }) {
     ]
   });
 
-  // --- Step 3: Degustação do Mural ---
+  // --- Step 3: Degustação do Mural & Ideias Adotadas ---
   const [dbProjects, setDbProjects] = useState([]);
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [selectedArea, setSelectedArea] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [activeModalProject, setActiveModalProject] = useState(null);
   const [interestedProjectIds, setInterestedProjectIds] = useState([]);
+  const [adoptedProjects, setAdoptedProjects] = useState([]);
+  const MAX_ADOPTED_PROJECTS = 2; // Proteção contra adoção massiva que polua o mural
 
   // --- Step 4: Validação & Opinião ---
   const [validation, setValidation] = useState({
@@ -148,7 +160,8 @@ export default function InterviewScreen({ embedded = false }) {
       areas: p.areas && p.areas.length > 0 ? p.areas : [p.area]
     }));
 
-    return [...realList, ...dbSuggestedList, ...mockList];
+    const combined = [...realList, ...dbSuggestedList, ...mockList];
+    return shuffleList(combined);
   }, [dbProjects]);
 
   // Filtragem
@@ -175,20 +188,40 @@ export default function InterviewScreen({ embedded = false }) {
 
   // Se o usuário clicar em "Quero Adotar Esta Ideia" em um mock no modal:
   const handleAdoptIdea = (mockProj) => {
-    setExperience((prev) => ({
+    const isAlreadyAdopted = adoptedProjects.some(
+      (p) => p.project_id === mockProj.project_id || p.name.toLowerCase() === mockProj.name.toLowerCase()
+    );
+
+    if (isAlreadyAdopted) {
+      // Desfaz a adoção caso já esteja na lista
+      setAdoptedProjects((prev) =>
+        prev.filter((p) => p.project_id !== mockProj.project_id && p.name.toLowerCase() !== mockProj.name.toLowerCase())
+      );
+      setActiveModalProject(null);
+      return;
+    }
+
+    if (adoptedProjects.length >= MAX_ADOPTED_PROJECTS) {
+      alert(`Por segurança e foco na equipe, você pode adotar no máximo ${MAX_ADOPTED_PROJECTS} ideias sugeridas por entrevista.`);
+      return;
+    }
+
+    setAdoptedProjects((prev) => [
       ...prev,
-      wants_to_create_project: true,
-      project_name: mockProj.name,
-      project_description: mockProj.description,
-      project_area: mockProj.area || 'Tecnologia',
-      roles: (mockProj.roles || []).map((r) => ({
-        role_name: r.name,
-        role_explanation: r.explanation,
-        role_quantity: 1
-      }))
-    }));
+      {
+        project_id: mockProj.project_id,
+        name: mockProj.name,
+        description: mockProj.description,
+        area: (mockProj.areas && mockProj.areas[0]) || mockProj.area || 'Tecnologia',
+        roles: (mockProj.roles || []).map((r) => ({
+          role_name: r.name,
+          role_explanation: r.explanation || '',
+          role_quantity: 1
+        })),
+        is_suggested: false // O usuário passa a liderar o projeto
+      }
+    ]);
     setActiveModalProject(null);
-    setCurrentStep(2); // Retorna para etapa de projeto para revisar
   };
 
   // Validação de etapas
@@ -220,6 +253,41 @@ export default function InterviewScreen({ embedded = false }) {
     try {
       setSubmitting(true);
 
+      // 1. Projeto próprio criado na Etapa 2 (se preenchido e desejado)
+      const projectsToCreate = [];
+      if (experience.wants_to_create_project && experience.project_name.trim().length >= 2) {
+        projectsToCreate.push({
+          name: experience.project_name.trim(),
+          description: experience.project_description.trim(),
+          area: experience.project_area,
+          roles: (experience.roles || [])
+            .filter((r) => r.role_name && r.role_name.trim().length > 0)
+            .map((r) => ({
+              role_name: r.role_name.trim(),
+              role_explanation: (r.role_explanation || '').trim(),
+              role_quantity: 1
+            })),
+          is_suggested: !experience.wants_to_be_owner
+        });
+      }
+
+      // 2. Ideias sugeridas adotadas na Etapa 3 (não sobrescrevem o projeto próprio)
+      for (const ap of adoptedProjects) {
+        projectsToCreate.push({
+          name: ap.name.trim(),
+          description: ap.description.trim(),
+          area: ap.area,
+          roles: (ap.roles || [])
+            .filter((r) => r.role_name && r.role_name.trim().length > 0)
+            .map((r) => ({
+              role_name: r.role_name.trim(),
+              role_explanation: (r.role_explanation || '').trim(),
+              role_quantity: 1
+            })),
+          is_suggested: false
+        });
+      }
+
       const payload = {
         name: profile.name,
         email: profile.email,
@@ -234,16 +302,9 @@ export default function InterviewScreen({ embedded = false }) {
         past_barriers: experience.past_barriers,
         how_would_act_on_incoming_interest: experience.how_would_act_on_incoming_interest,
 
-        wants_to_create_project: experience.wants_to_create_project,
-        proposed_project: experience.wants_to_create_project
-          ? {
-              name: experience.project_name.trim(),
-              description: experience.project_description.trim(),
-              area: experience.project_area,
-              roles: experience.roles,
-              is_suggested: !experience.wants_to_be_owner
-            }
-          : null,
+        wants_to_create_project: projectsToCreate.length > 0,
+        proposed_project: projectsToCreate.length > 0 ? projectsToCreate[0] : null,
+        proposed_projects: projectsToCreate,
 
         interested_project_ids: interestedProjectIds,
 
@@ -255,7 +316,7 @@ export default function InterviewScreen({ embedded = false }) {
 
       const result = await interviewService.submitInterview(payload);
       setCompletedData(result);
-      if (result.created_project_id) {
+      if (result.created_project_id || (result.created_project_ids && result.created_project_ids.length > 0)) {
         window.dispatchEvent(new CustomEvent('project-created', { detail: result }));
       }
     } catch (err) {
@@ -292,6 +353,7 @@ export default function InterviewScreen({ embedded = false }) {
       ]
     });
     setInterestedProjectIds([]);
+    setAdoptedProjects([]);
     setValidation({
       would_reach_out: '',
       interdisciplinary_opinion: '',
@@ -449,13 +511,19 @@ export default function InterviewScreen({ embedded = false }) {
 
               <div className="p-4 rounded-2xl border-2 border-gray-900 bg-[#FFA900]/10 border-[#FFA900] shadow-[3px_3px_0px_#000]">
                 <span className="text-[11px] font-black uppercase tracking-wider text-amber-900 block mb-1">
-                  2. Projeto Publicado
+                  2. {completedData.created_projects_count > 1 ? `${completedData.created_projects_count} Projetos Publicados` : 'Projeto Publicado'}
                 </span>
                 <p className="text-sm font-bold text-gray-900">
-                  {completedData.created_project_id ? 'Projeto Ao Vivo no Mural 🚀' : 'Nenhum projeto criado'}
+                  {completedData.created_projects_count > 1
+                    ? `${completedData.created_projects_count} Projetos Ao Vivo no Mural 🚀`
+                    : completedData.created_project_id
+                    ? 'Projeto Ao Vivo no Mural 🚀'
+                    : 'Nenhum projeto criado'}
                 </p>
                 <p className="text-xs text-gray-600 mt-0.5">
-                  {completedData.created_project_id ? 'Já visível para outros alunos!' : 'Poderá criar a qualquer momento.'}
+                  {completedData.created_project_id || completedData.created_projects_count > 0
+                    ? 'Já visível para outros alunos!'
+                    : 'Poderá criar a qualquer momento.'}
                 </p>
               </div>
 
@@ -896,10 +964,15 @@ export default function InterviewScreen({ embedded = false }) {
                       </div>
 
                       <div>
-                        <div className="flex items-center justify-between mb-2">
-                          <label className="text-xs font-black uppercase tracking-wider text-gray-700">
-                            Vagas / Habilidades que você busca:
-                          </label>
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
+                          <div>
+                            <label className="text-xs font-black uppercase tracking-wider text-gray-700 block">
+                              Vagas / Habilidades que você busca (opcional):
+                            </label>
+                            <span className="text-[11px] text-gray-500 font-medium">
+                              Adicione competências que procura ou crie sem vagas para defini-las depois.
+                            </span>
+                          </div>
                           <button
                             type="button"
                             onClick={() =>
@@ -907,58 +980,87 @@ export default function InterviewScreen({ embedded = false }) {
                                 ...experience,
                                 roles: [
                                   ...experience.roles,
-                                  { role_name: 'Novo Papel', role_explanation: 'Descrição da função.', role_quantity: 1 }
+                                  { role_name: '', role_explanation: '', role_quantity: 1 }
                                 ]
                               })
                             }
-                            className="text-xs font-black text-gray-900 flex items-center gap-1 hover:underline"
+                            className="text-xs font-black text-gray-900 flex items-center gap-1 hover:underline self-start sm:self-auto"
                           >
                             <Plus className="h-3 w-3" /> Adicionar Vaga
                           </button>
                         </div>
 
-                        <div className="space-y-2">
-                          {experience.roles.map((r, rIdx) => (
-                            <div key={rIdx} className="flex gap-2 items-center">
-                              <input
-                                type="text"
-                                placeholder="Nome da Vaga (ex: UI Designer)"
-                                value={r.role_name}
-                                onChange={(e) => {
-                                  const updated = [...experience.roles];
-                                  updated[rIdx].role_name = e.target.value;
-                                  setExperience({ ...experience, roles: updated });
-                                }}
-                                className="flex-1 p-2.5 rounded-xl border-2 border-gray-900 bg-white text-xs font-bold"
-                              />
-                              <input
-                                type="text"
-                                placeholder="Breve explicação"
-                                value={r.role_explanation}
-                                onChange={(e) => {
-                                  const updated = [...experience.roles];
-                                  updated[rIdx].role_explanation = e.target.value;
-                                  setExperience({ ...experience, roles: updated });
-                                }}
-                                className="flex-2 p-2.5 rounded-xl border-2 border-gray-900 bg-white text-xs font-medium"
-                              />
-                              {experience.roles.length > 1 && (
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setExperience({
-                                      ...experience,
-                                      roles: experience.roles.filter((_, i) => i !== rIdx)
-                                    });
+                        {experience.roles.length === 0 ? (
+                          <div className="p-4 rounded-xl border-2 border-dashed border-gray-300 text-center bg-white/70">
+                            <p className="text-xs font-bold text-gray-700">
+                              Nenhuma vaga em aberto cadastrada no momento.
+                            </p>
+                            <p className="text-[11px] text-gray-500 mt-0.5">
+                              O projeto será criado sem vagas extras. Você poderá abrir vagas e buscar colaboradores a qualquer momento.
+                            </p>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setExperience({
+                                  ...experience,
+                                  roles: [
+                                    { role_name: '', role_explanation: '', role_quantity: 1 }
+                                  ]
+                                })
+                              }
+                              className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-900 text-white text-xs font-black hover:bg-black transition-colors"
+                            >
+                              <Plus className="h-3 w-3" /> Adicionar Primeira Vaga
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="space-y-2.5">
+                            {experience.roles.map((r, rIdx) => (
+                              <div
+                                key={rIdx}
+                                className="flex flex-col sm:flex-row gap-2 sm:items-center p-2.5 sm:p-0 bg-white sm:bg-transparent rounded-xl sm:rounded-none border border-gray-200 sm:border-0"
+                              >
+                                <input
+                                  type="text"
+                                  placeholder="Nome da Vaga (ex: UI Designer)"
+                                  value={r.role_name}
+                                  onChange={(e) => {
+                                    const updated = [...experience.roles];
+                                    updated[rIdx].role_name = e.target.value;
+                                    setExperience({ ...experience, roles: updated });
                                   }}
-                                  className="h-9 w-9 rounded-xl bg-red-100 text-red-600 hover:bg-red-200 flex items-center justify-center transition-colors"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </button>
-                              )}
-                            </div>
-                          ))}
-                        </div>
+                                  className="w-full sm:w-1/3 min-w-0 p-2.5 rounded-xl border-2 border-gray-900 bg-white text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#FFA900]"
+                                />
+                                <input
+                                  type="text"
+                                  placeholder="Breve explicação da função"
+                                  value={r.role_explanation}
+                                  onChange={(e) => {
+                                    const updated = [...experience.roles];
+                                    updated[rIdx].role_explanation = e.target.value;
+                                    setExperience({ ...experience, roles: updated });
+                                  }}
+                                  className="w-full sm:flex-1 min-w-0 p-2.5 rounded-xl border-2 border-gray-900 bg-white text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#FFA900]"
+                                />
+                                <div className="flex justify-end sm:block">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setExperience({
+                                        ...experience,
+                                        roles: experience.roles.filter((_, i) => i !== rIdx)
+                                      });
+                                    }}
+                                    className="h-9 w-9 rounded-xl bg-red-100 text-red-600 hover:bg-red-200 flex items-center justify-center transition-colors flex-shrink-0"
+                                    title="Remover esta vaga"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
@@ -1022,6 +1124,43 @@ export default function InterviewScreen({ embedded = false }) {
                   </div>
                 </div>
 
+                {/* Banner de Ideias Adotadas */}
+                {adoptedProjects.length > 0 && (
+                  <div className="p-4 rounded-2xl bg-amber-500/10 border-2 border-[#FFA900] flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in fade-in">
+                    <div className="flex items-start gap-3">
+                      <div className="h-9 w-9 rounded-xl bg-[#FFA900] text-black font-black flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm">
+                        🚀
+                      </div>
+                      <div>
+                        <p className="text-xs font-black uppercase tracking-wider text-amber-900">
+                          Ideias Adotadas para Liderar ({adoptedProjects.length}/{MAX_ADOPTED_PROJECTS}):
+                        </p>
+                        <div className="flex flex-wrap gap-2 mt-1.5">
+                          {adoptedProjects.map((ap, idx) => (
+                            <span
+                              key={idx}
+                              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white border border-amber-300 text-xs font-bold text-gray-900 shadow-sm"
+                            >
+                              <span>{ap.name}</span>
+                              <button
+                                type="button"
+                                onClick={() => setAdoptedProjects((prev) => prev.filter((_, i) => i !== idx))}
+                                className="text-gray-400 hover:text-red-600 transition-colors"
+                                title="Remover ideia adotada"
+                              >
+                                ✕
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <span className="text-[11px] text-amber-800 font-semibold self-start sm:self-auto">
+                      Serão criadas sob sua liderança ao concluir a pesquisa.
+                    </span>
+                  </div>
+                )}
+
                 {/* Grid de Projetos */}
                 {loadingProjects ? (
                   <div className="p-12 text-center text-gray-400 font-bold">Carregando projetos do mural...</div>
@@ -1030,11 +1169,16 @@ export default function InterviewScreen({ embedded = false }) {
                     {filteredProjects.map((p) => {
                       const isInterested = interestedProjectIds.includes(p.project_id);
                       const isMock = Boolean(p.is_mock);
+                      const isAdopted = adoptedProjects.some(
+                        (ap) => ap.project_id === p.project_id || ap.name.toLowerCase() === p.name.toLowerCase()
+                      );
                       return (
                         <div
                           key={p.project_id}
                           className={`p-4 rounded-2xl border-2 transition-all flex flex-col justify-between ${
-                            isInterested
+                            isAdopted
+                              ? 'bg-emerald-50/70 border-emerald-600 shadow-[3px_3px_0px_#059669]'
+                              : isInterested
                               ? 'bg-amber-50/80 border-[#FFA900] shadow-[3px_3px_0px_#FFA900]'
                               : 'bg-white border-gray-900 hover:shadow-[3px_3px_0px_#000]'
                           }`}
@@ -1045,9 +1189,15 @@ export default function InterviewScreen({ embedded = false }) {
                                 {p.areas?.[0] || p.area}
                               </span>
                               {isMock ? (
-                                <span className="text-[10px] font-black text-amber-900 bg-amber-100 px-2 py-0.5 rounded-lg">
-                                  💡 Ideia Sugerida
-                                </span>
+                                isAdopted ? (
+                                  <span className="text-[10px] font-black text-white bg-emerald-700 px-2 py-0.5 rounded-lg flex items-center gap-1 shadow-sm">
+                                    <Rocket className="h-3 w-3" /> Adotada por Você
+                                  </span>
+                                ) : (
+                                  <span className="text-[10px] font-black text-amber-900 bg-amber-100 px-2 py-0.5 rounded-lg">
+                                    💡 Ideia Sugerida
+                                  </span>
+                                )
                               ) : (
                                 <span className="text-[10px] font-black text-green-800 bg-green-100 px-2 py-0.5 rounded-lg">
                                   🟢 Projeto Ativo
@@ -1282,23 +1432,52 @@ export default function InterviewScreen({ embedded = false }) {
                     <div className="h-8 w-8 rounded-xl bg-gray-900 text-white font-black flex items-center justify-center flex-shrink-0 mt-0.5">
                       🚀
                     </div>
-                    <div>
-                      <h4 className="font-black text-sm text-gray-900">2. Publicação de Projeto</h4>
-                      {experience.wants_to_create_project && experience.project_name ? (
-                        <p className="text-xs text-gray-600 mt-0.5">
-                          O projeto <strong>"{experience.project_name}"</strong> será cadastrado no banco de dados como{' '}
-                          {experience.wants_to_be_owner ? (
-                            <strong className="text-emerald-700">Projeto Ativo sob sua liderança</strong>
-                          ) : (
-                            <strong className="text-amber-700">Ideia Sugerida Aberta (Aguardando Líder)</strong>
-                          )}{' '}
-                          e aparecerá imediatamente no Mural!
-                        </p>
-                      ) : (
-                        <p className="text-xs text-gray-500 mt-0.5">
-                          Nenhum projeto cadastrado nesta entrevista. Você poderá propor ideias a qualquer momento após entrar.
-                        </p>
-                      )}
+                    <div className="flex-1">
+                      <h4 className="font-black text-sm text-gray-900">2. Publicação de Projeto(s) no Mural</h4>
+                      {(() => {
+                        const hasOwnProject = experience.wants_to_create_project && experience.project_name.trim().length >= 2;
+                        const hasAdopted = adoptedProjects.length > 0;
+
+                        if (!hasOwnProject && !hasAdopted) {
+                          return (
+                            <p className="text-xs text-gray-500 mt-0.5">
+                              Nenhum projeto cadastrado nesta entrevista. Você poderá propor ou adotar ideias a qualquer momento após entrar.
+                            </p>
+                          );
+                        }
+
+                        return (
+                          <div className="mt-2 space-y-2">
+                            {hasOwnProject && (
+                              <div className="p-3 rounded-xl bg-white border-2 border-gray-900 text-xs shadow-sm">
+                                <span className="font-black text-gray-900 block text-xs">
+                                  Projeto Próprio: "{experience.project_name}"
+                                </span>
+                                <span className="text-[11px] text-gray-600 block mt-0.5">
+                                  {experience.wants_to_be_owner ? (
+                                    <strong className="text-emerald-700">Projeto Ativo sob sua liderança</strong>
+                                  ) : (
+                                    <strong className="text-amber-700">Ideia Sugerida Aberta (Aguardando Líder)</strong>
+                                  )}{' '}
+                                  • {experience.roles.filter(r => r.role_name && r.role_name.trim()).length} vaga(s) em aberto
+                                </span>
+                              </div>
+                            )}
+                            {hasAdopted && (
+                              adoptedProjects.map((ap, idx) => (
+                                <div key={idx} className="p-3 rounded-xl bg-amber-50/90 border-2 border-[#FFA900] text-xs shadow-sm">
+                                  <span className="font-black text-gray-900 block text-xs">
+                                    Ideia Adotada do Mural: "{ap.name}"
+                                  </span>
+                                  <span className="text-[11px] text-emerald-700 font-bold block mt-0.5">
+                                    Liderança do projeto assumida por você • {ap.roles.length} vaga(s) em aberto
+                                  </span>
+                                </div>
+                              ))
+                            )}
+                          </div>
+                        );
+                      })()}
                     </div>
                   </div>
 
@@ -1385,6 +1564,9 @@ export default function InterviewScreen({ embedded = false }) {
           onClose={() => setActiveModalProject(null)}
           isInterviewMode={true}
           isInterested={interestedProjectIds.includes(activeModalProject.project_id)}
+          isAdopted={adoptedProjects.some(
+            (ap) => ap.project_id === activeModalProject.project_id || ap.name.toLowerCase() === activeModalProject.name.toLowerCase()
+          )}
           onToggleInterest={(id, state) => handleToggleInterest(id, state)}
           onStartProject={(mockProj) => handleAdoptIdea(mockProj)}
         />

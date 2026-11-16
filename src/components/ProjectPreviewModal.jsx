@@ -20,9 +20,11 @@ export default function ProjectPreviewModal({
   onToggleInterest,
   onStartProject,
   isInterested = false,
-  isInterviewMode = false
+  isInterviewMode = false,
+  isAdopted = false
 }) {
-  const { user } = useAuth();
+  const auth = useAuth ? useAuth() : null;
+  const user = auth?.user || null;
   const navigate = useNavigate();
   const [localInterested, setLocalInterested] = useState(isInterested);
 
@@ -275,10 +277,30 @@ export default function ProjectPreviewModal({
             <div className="flex items-center gap-2 w-full sm:w-auto">
               <button
                 onClick={handleStartIdea}
-                className="w-full sm:w-auto px-6 py-3.5 rounded-2xl font-black text-xs uppercase tracking-wider text-black bg-[#FFA900] hover:bg-gray-900 hover:text-white shadow-lg shadow-[#FFA900]/30 hover:shadow-xl transition-all flex items-center justify-center gap-2"
+                className={`w-full sm:w-auto px-6 py-3.5 rounded-2xl font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 ${
+                  isInterviewMode && isAdopted
+                    ? 'bg-emerald-600 text-white hover:bg-red-600 shadow-lg shadow-emerald-600/20'
+                    : 'text-black bg-[#FFA900] hover:bg-gray-900 hover:text-white shadow-lg shadow-[#FFA900]/30 hover:shadow-xl'
+                }`}
               >
-                <Rocket className="h-4 w-4" />
-                {isInterviewMode ? 'Quero Adotar Esta Ideia 🚀' : (user ? 'Copiar & Iniciar Projeto 🚀' : 'Cadastre-se para Iniciar 🚀')}
+                {isInterviewMode ? (
+                  isAdopted ? (
+                    <>
+                      <CheckCircle2 className="h-4 w-4" />
+                      Ideia Adotada ✓ (Remover)
+                    </>
+                  ) : (
+                    <>
+                      <Rocket className="h-4 w-4" />
+                      Quero Adotar Esta Ideia 🚀
+                    </>
+                  )
+                ) : (
+                  <>
+                    <Rocket className="h-4 w-4" />
+                    {user ? 'Copiar & Iniciar Projeto 🚀' : 'Cadastre-se para Iniciar 🚀'}
+                  </>
+                )}
               </button>
             </div>
           ) : (
