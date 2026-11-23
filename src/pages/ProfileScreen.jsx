@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { BookOpen, MapPin, Sparkles, Building2, FolderGit2, ArrowRight, Plus } from 'lucide-react';
+import { BookOpen, MapPin, Sparkles, Building2, FolderGit2, ArrowRight, Plus, Target } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { projectService } from '../services/api';
 import OrbitIcon from '../icons/OrbitIcon';
+import EditProfileModal from '../components/EditProfileModal';
 
 const ProfileScreen = () => {
   const { user, token } = useAuth();
   const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
   const [loadingProjects, setLoadingProjects] = useState(true);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   useEffect(() => {
     if (user?.user_id) {
@@ -32,7 +34,7 @@ const ProfileScreen = () => {
         <div className="h-56 bg-gradient-to-br from-[#FFA900] to-[#FF8C00] relative">
           <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '40px 40px' }} />
         </div>
-        <div className="px-12 pb-14 relative">
+        <div className="px-6 sm:px-12 pb-14 relative">
           <div className="h-36 w-32 rounded-2xl border-[10px] border-white bg-gray-900 -mt-18 mb-10 shadow-2xl flex items-center justify-center text-white text-7xl font-black rotate-3 hover:rotate-0 transition-all duration-500 group cursor-help animate-in zoom-in-50">
             <span className="group-hover:scale-110 transition-transform">{user.name?.[0] || '?'}</span>
           </div>
@@ -40,46 +42,88 @@ const ProfileScreen = () => {
           <div className="flex flex-col sm:flex-row justify-between items-start gap-8 mb-12">
             <div>
               <h1 className="text-5xl font-black text-gray-900 tracking-tighter mb-3 leading-none">{user.name}</h1>
-              <div className="flex items-center gap-4">
+              <div className="flex flex-wrap items-center gap-3">
                 <span className="px-5 py-2 bg-[#FFA900] text-black text-[10px] font-black rounded-full uppercase tracking-widest shadow-lg shadow-orange-100">
                   {user.course?.area || 'Acadêmico'}
                 </span>
+                {(user.macro_areas?.length > 0
+                  ? user.macro_areas
+                  : [user.macro_area, user.secondary_macro_area].filter(Boolean)
+                ).map((m, idx) => (
+                  <span key={m.macro_area_id || idx} className="px-4 py-2 bg-gray-900 text-[#FFA900] text-[10px] font-black rounded-full uppercase tracking-widest flex items-center gap-1.5 shadow-md">
+                    <Target className="h-3.5 w-3.5 text-[#FFA900]" />
+                    {m.name}
+                  </span>
+                ))}
                 <span className="text-gray-400 font-black text-[11px] tracking-widest uppercase border-l border-gray-200 pl-4">MATRÍCULA #{user.user_id}</span>
               </div>
             </div>
-            <button className="w-full sm:w-auto px-10 py-5 bg-gray-900 text-white border-2 border-gray-900 rounded-2xl text-[11px] font-black hover:bg-transparent hover:text-gray-900 transition-all shadow-xl uppercase tracking-[0.2em] active:scale-95">
+            <button 
+              onClick={() => setIsEditModalOpen(true)}
+              className="w-full sm:w-auto px-10 py-5 bg-gray-900 text-white border-2 border-gray-900 rounded-2xl text-[11px] font-black hover:bg-transparent hover:text-gray-900 transition-all shadow-xl uppercase tracking-[0.2em] active:scale-95"
+            >
               Editar Perfil
             </button>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <div className="p-6 bg-gray-50/50 rounded-2xl border border-gray-100 group hover:border-[#FFA900]/40 transition-all hover:bg-white shadow-sm flex flex-col justify-between">
-              <span className="block text-[10px] font-black text-gray-400 uppercase mb-3 tracking-[0.3em]">Graduação</span>
-              <div className="flex items-center gap-4 text-base font-black text-gray-800">
-                <div className="p-3 bg-white rounded-xl shadow-md border border-gray-50 shrink-0">
-                  <BookOpen className="h-5 w-5 text-[#FFA900]" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+            <div className="p-5 sm:p-6 bg-gray-50/50 rounded-2xl border border-gray-100 group hover:border-[#FFA900]/40 transition-all hover:bg-white shadow-sm flex flex-col justify-between min-w-0">
+              <span className="block text-[10px] font-black text-gray-400 uppercase mb-3 tracking-widest truncate">Habilidade Prática</span>
+              <div className="flex items-center gap-3.5 sm:gap-4 min-w-0">
+                <div className="p-3 bg-white rounded-xl shadow-md border border-gray-50 shrink-0 text-[#FFA900]">
+                  <Target className="h-5 w-5" />
                 </div>
-                <span className="leading-snug">{user.course?.name || "Não informado"}</span>
+                <span 
+                  className="text-sm sm:text-base font-black text-gray-800 leading-snug break-words min-w-0 flex-1"
+                  title={(user.macro_areas?.length > 0 ? user.macro_areas : [user.macro_area, user.secondary_macro_area].filter(Boolean)).map(m => m.name).join(' • ') || "Não informada"}
+                >
+                  {(user.macro_areas?.length > 0 ? user.macro_areas : [user.macro_area, user.secondary_macro_area].filter(Boolean)).map(m => m.name).join(' • ') || "Não informada"}
+                </span>
               </div>
             </div>
 
-            <div className="p-6 bg-gray-50/50 rounded-2xl border border-gray-100 group hover:border-[#FFA900]/40 transition-all hover:bg-white shadow-sm flex flex-col justify-between">
-              <span className="block text-[10px] font-black text-gray-400 uppercase mb-3 tracking-[0.3em]">Instituição</span>
-              <div className="flex items-center gap-4 text-base font-black text-gray-800">
-                <div className="p-3 bg-white rounded-xl shadow-md border border-gray-50 shrink-0">
-                  <Building2 className="h-5 w-5 text-[#FFA900]" />
+            <div className="p-5 sm:p-6 bg-gray-50/50 rounded-2xl border border-gray-100 group hover:border-[#FFA900]/40 transition-all hover:bg-white shadow-sm flex flex-col justify-between min-w-0">
+              <span className="block text-[10px] font-black text-gray-400 uppercase mb-3 tracking-widest truncate">Graduação</span>
+              <div className="flex items-center gap-3.5 sm:gap-4 min-w-0">
+                <div className="p-3 bg-white rounded-xl shadow-md border border-gray-50 shrink-0 text-[#FFA900]">
+                  <BookOpen className="h-5 w-5" />
                 </div>
-                <span className="leading-snug">{user.college?.name || "Não informada"}</span>
+                <span 
+                  className="text-sm sm:text-base font-black text-gray-800 leading-snug break-words min-w-0 flex-1"
+                  title={user.course?.name || "Não informado"}
+                >
+                  {user.course?.name || "Não informado"}
+                </span>
               </div>
             </div>
 
-            <div className="p-6 bg-gray-50/50 rounded-2xl border border-gray-100 group hover:border-[#FFA900]/40 transition-all hover:bg-white shadow-sm flex flex-col justify-between">
-              <span className="block text-[10px] font-black text-gray-400 uppercase mb-3 tracking-[0.3em]">Jornada</span>
-              <div className="flex items-center gap-4 text-base font-black text-gray-800">
-                <div className="p-3 bg-white rounded-xl shadow-md border border-gray-50 shrink-0">
-                  <MapPin className="h-5 w-5 text-[#FFA900]" />
+            <div className="p-5 sm:p-6 bg-gray-50/50 rounded-2xl border border-gray-100 group hover:border-[#FFA900]/40 transition-all hover:bg-white shadow-sm flex flex-col justify-between min-w-0">
+              <span className="block text-[10px] font-black text-gray-400 uppercase mb-3 tracking-widest truncate">Instituição</span>
+              <div className="flex items-center gap-3.5 sm:gap-4 min-w-0">
+                <div className="p-3 bg-white rounded-xl shadow-md border border-gray-50 shrink-0 text-[#FFA900]">
+                  <Building2 className="h-5 w-5" />
                 </div>
-                <span className="leading-snug">{user.period}º Período</span>
+                <span 
+                  className="text-sm sm:text-base font-black text-gray-800 leading-snug break-words min-w-0 flex-1"
+                  title={user.college?.name || "Não informada"}
+                >
+                  {user.college?.name || "Não informada"}
+                </span>
+              </div>
+            </div>
+
+            <div className="p-5 sm:p-6 bg-gray-50/50 rounded-2xl border border-gray-100 group hover:border-[#FFA900]/40 transition-all hover:bg-white shadow-sm flex flex-col justify-between min-w-0">
+              <span className="block text-[10px] font-black text-gray-400 uppercase mb-3 tracking-widest truncate">Jornada</span>
+              <div className="flex items-center gap-3.5 sm:gap-4 min-w-0">
+                <div className="p-3 bg-white rounded-xl shadow-md border border-gray-50 shrink-0 text-[#FFA900]">
+                  <MapPin className="h-5 w-5" />
+                </div>
+                <span 
+                  className="text-sm sm:text-base font-black text-gray-800 leading-snug break-words min-w-0 flex-1"
+                  title={`${user.period}º Período`}
+                >
+                  {user.period}º Período
+                </span>
               </div>
             </div>
           </div>
@@ -165,6 +209,11 @@ const ProfileScreen = () => {
           </div>
         )}
       </section>
+
+      <EditProfileModal 
+        isOpen={isEditModalOpen} 
+        onClose={() => setIsEditModalOpen(false)} 
+      />
     </div>
   );
 };

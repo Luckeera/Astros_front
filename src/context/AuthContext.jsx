@@ -76,7 +76,11 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
-  const authValue = useMemo(() => ({ user, token, login, register, logout, loading }), [user, token, loading]);
+  const updateUser = (updatedData) => {
+    setUser(prev => (prev ? { ...prev, ...updatedData } : updatedData));
+  };
+
+  const authValue = useMemo(() => ({ user, token, login, register, logout, loading, updateUser }), [user, token, loading]);
 
   if (loading) return (
     <div className="h-screen flex flex-col items-center justify-center font-bold gap-4 bg-gray-50">

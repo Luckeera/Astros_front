@@ -20,11 +20,40 @@ import {
   Calendar,
   Layers,
   HelpCircle,
-  Lock
+  Lock,
+  Target,
+  AlertCircle,
+  Code2,
+  Palette,
+  Binary,
+  TrendingUp,
+  Video,
+  Cpu,
+  HeartPulse,
+  Scale,
+  Sprout,
+  Check
 } from 'lucide-react';
-import { projectService, interviewService } from '../services/api';
+import { projectService, interviewService, macroAreaService } from '../services/api';
 import { MURAL_AREAS, MURAL_PROJECTS } from '../services/muralData';
+import { OFFICIAL_MACRO_AREAS } from '../services/macroAreasData';
 import ProjectPreviewModal from '../components/ProjectPreviewModal';
+
+const ICON_MAP = {
+  Code2,
+  Palette,
+  Binary,
+  TrendingUp,
+  Target,
+  Video,
+  Cpu,
+  HeartPulse,
+  Scale,
+  GraduationCap,
+  Users,
+  Sprout,
+  Sparkles
+};
 
 const STEPS = [
   { id: 1, title: 'Perfil & Boas-Vindas', subtitle: 'Identificação básica' },
@@ -74,8 +103,14 @@ export default function InterviewScreen({ embedded = false }) {
     college_name: '',
     course_name: '',
     period: 1,
-    age: ''
+    age: '',
+    macro_area_ids: [],
+    macro_area_id: '',
+    secondary_macro_area_id: '',
+    respondent_macro_area: '',
+    respondent_secondary_macro_area: ''
   });
+  const [macroLimitWarning, setMacroLimitWarning] = useState(false);
 
   // --- Step 2: Experiência & Ideia ---
   const [experience, setExperience] = useState({
@@ -111,6 +146,82 @@ export default function InterviewScreen({ embedded = false }) {
     valuable_features: [],
     feedback: ''
   });
+
+  // --- Macro Áreas de Habilidades Práticas ---
+  const [macroAreasList, setMacroAreasList] = useState(OFFICIAL_MACRO_AREAS);
+  const [macroSearch, setMacroSearch] = useState('');
+
+  useEffect(() => {
+    if (macroAreaService && typeof macroAreaService.getMacroAreas === 'function') {
+      macroAreaService.getMacroAreas()
+        .then((data) => {
+          if (Array.isArray(data) && data.length > 0) {
+            setMacroAreasList(data);
+          }
+        })
+        .catch(() => setMacroAreasList(OFFICIAL_MACRO_AREAS));
+    }
+  }, []);
+
+  const filteredMacroAreas = useMemo(() => {
+    if (!macroSearch.trim()) return macroAreasList;
+    const term = macroSearch.toLowerCase().trim();
+    return macroAreasList.filter(
+      (m) =>
+        (m.name && m.name.toLowerCase().includes(term)) ||
+        (m.description && m.description.toLowerCase().includes(term))
+    );
+  }, [macroAreasList, macroSearch]);
+
+  const handleSelectMacroArea = (macro) => {
+    setMacroLimitWarning(false);
+    const currentIds = Array.isArray(profile.macro_area_ids) && profile.macro_area_ids.length > 0
+      ? profile.macro_area_ids
+      : (profile.macro_area_id ? [Number(profile.macro_area_id)] : []);
+    const isAlreadySelected = currentIds.includes(macro.macro_area_id);
+
+    if (isAlreadySelected) {
+      const nextIds = currentIds.filter((id) => id !== macro.macro_area_id);
+      const firstMacro = macroAreasList.find((m) => m.macro_area_id === nextIds[0]);
+      const secondMacro = macroAreasList.find((m) => m.macro_area_id === nextIds[1]);
+      setProfile((prev) => ({
+        ...prev,
+        macro_area_ids: nextIds,
+        macro_area_id: nextIds[0] || '',
+        secondary_macro_area_id: nextIds[1] || '',
+        respondent_macro_area: firstMacro ? firstMacro.name : '',
+        respondent_secondary_macro_area: secondMacro ? secondMacro.name : ''
+      }));
+    } else {
+      if (currentIds.length >= 2) {
+        setMacroLimitWarning(true);
+        return;
+      }
+      const nextIds = [...currentIds, macro.macro_area_id];
+      const firstMacro = macroAreasList.find((m) => m.macro_area_id === nextIds[0]);
+      const secondMacro = macroAreasList.find((m) => m.macro_area_id === nextIds[1]);
+      setProfile((prev) => ({
+        ...prev,
+        macro_area_ids: nextIds,
+        macro_area_id: nextIds[0] || '',
+        secondary_macro_area_id: nextIds[1] || '',
+        respondent_macro_area: firstMacro ? firstMacro.name : '',
+        respondent_secondary_macro_area: secondMacro ? secondMacro.name : ''
+      }));
+    }
+  };
+
+  const handleClearMacroAreas = () => {
+    setMacroLimitWarning(false);
+    setProfile((prev) => ({
+      ...prev,
+      macro_area_ids: [],
+      macro_area_id: '',
+      secondary_macro_area_id: '',
+      respondent_macro_area: '',
+      respondent_secondary_macro_area: ''
+    }));
+  };
 
   // Carrega projetos reais do banco de dados
   useEffect(() => {
@@ -296,6 +407,11 @@ export default function InterviewScreen({ embedded = false }) {
         course_name: profile.course_name,
         period: Number(profile.period) || 1,
         age: profile.age ? Number(profile.age) : null,
+        macro_area_id: profile.macro_area_ids?.[0] ? Number(profile.macro_area_ids[0]) : (profile.macro_area_id ? Number(profile.macro_area_id) : null),
+        secondary_macro_area_id: profile.macro_area_ids?.[1] ? Number(profile.macro_area_ids[1]) : (profile.secondary_macro_area_id ? Number(profile.secondary_macro_area_id) : null),
+        macro_area_ids: (profile.macro_area_ids && profile.macro_area_ids.length > 0) ? profile.macro_area_ids.map(Number) : (profile.macro_area_id ? [Number(profile.macro_area_id)] : []),
+        respondent_macro_area: profile.respondent_macro_area || null,
+        respondent_secondary_macro_area: profile.respondent_secondary_macro_area || null,
 
         had_past_demand: experience.had_past_demand,
         details_past_demand: experience.details_past_demand,
@@ -335,8 +451,14 @@ export default function InterviewScreen({ embedded = false }) {
       college_name: '',
       course_name: '',
       period: 1,
-      age: ''
+      age: '',
+      macro_area_ids: [],
+      macro_area_id: '',
+      secondary_macro_area_id: '',
+      respondent_macro_area: '',
+      respondent_secondary_macro_area: ''
     });
+    setMacroLimitWarning(false);
     setExperience({
       had_past_demand: false,
       details_past_demand: '',
@@ -656,6 +778,136 @@ export default function InterviewScreen({ embedded = false }) {
                       onChange={(e) => setProfile({ ...profile, age: e.target.value })}
                       className="w-full p-3.5 rounded-2xl border-2 border-gray-900 bg-gray-50 focus:bg-white focus:outline-none font-medium text-sm"
                     />
+                  </div>
+
+                  {/* Macro Áreas de Habilidades Práticas (Suporte a até 2 competências) */}
+                  <div className="sm:col-span-2 space-y-3 pt-1">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2">
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <label className="text-xs font-black uppercase tracking-wider text-gray-900 flex items-center gap-1.5">
+                            <Target className="h-4 w-4 text-[#FFA900] shrink-0" />
+                            Macro Áreas de Habilidades Práticas
+                          </label>
+                          <span className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider border ${
+                            (profile.macro_area_ids?.length || (profile.macro_area_id ? 1 : 0)) === 2
+                              ? 'bg-[#FFA900] text-black border-[#FFA900]'
+                              : (profile.macro_area_ids?.length || (profile.macro_area_id ? 1 : 0)) === 1
+                              ? 'bg-amber-100 text-amber-900 border-amber-300'
+                              : 'bg-gray-100 text-gray-600 border-gray-200'
+                          }`}>
+                            {(profile.macro_area_ids?.length || (profile.macro_area_id ? 1 : 0)) === 2
+                              ? '2/2 selecionadas (máximo)'
+                              : (profile.macro_area_ids?.length || (profile.macro_area_id ? 1 : 0)) === 1
+                              ? '1/2 selecionada'
+                              : 'Escolha até 2'}
+                          </span>
+                        </div>
+                        <p className="text-[11px] sm:text-xs text-gray-500 font-medium mt-0.5">
+                          Selecione até 2 competências práticas que melhor representam seu perfil e o que você mais domina.
+                        </p>
+                      </div>
+                      {(profile.macro_area_ids?.length > 0 || profile.macro_area_id) && (
+                        <button
+                          type="button"
+                          onClick={handleClearMacroAreas}
+                          className="text-[10px] font-black text-gray-400 hover:text-red-500 uppercase tracking-wider transition-colors self-start sm:self-auto pt-0.5 sm:pt-0"
+                        >
+                          Limpar Seleção ({profile.macro_area_ids?.length || 1})
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Aviso amigável quando atinge o limite de 2 */}
+                    {macroLimitWarning && (
+                      <div className="p-3 rounded-2xl bg-amber-50 border-2 border-amber-400 text-amber-900 text-xs font-bold flex items-center justify-between animate-in fade-in duration-200">
+                        <span className="flex items-center gap-2">
+                          <AlertCircle className="h-4 w-4 text-amber-600 shrink-0" />
+                          Você já selecionou o limite máximo de 2 macro áreas práticas. Desmarque uma para poder escolher outra.
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setMacroLimitWarning(false)}
+                          className="text-amber-700 hover:text-black font-black text-sm ml-2 px-1"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Barra de Pesquisa de Macro Áreas */}
+                    <div className="relative w-full max-w-full">
+                      <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 pointer-events-none" />
+                      <input
+                        type="text"
+                        placeholder="Filtrar por habilidade ou área prática (ex: Software, Design, Dados)..."
+                        value={macroSearch}
+                        onChange={(e) => setMacroSearch(e.target.value)}
+                        className="w-full max-w-full pl-9 pr-4 py-2.5 bg-gray-50/80 border-2 border-gray-900 rounded-2xl text-xs sm:text-sm font-medium text-gray-900 placeholder:text-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFA900] transition-all"
+                      />
+                    </div>
+
+                    {/* Grid de Macro Áreas com scroll seguro e sem vazamento em telas móveis */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3 max-h-72 sm:max-h-80 overflow-y-auto overflow-x-hidden pr-1 p-0.5 w-full max-w-full">
+                      {filteredMacroAreas.length === 0 ? (
+                        <div className="col-span-1 md:col-span-2 p-5 text-center text-xs text-gray-500 font-medium bg-gray-50 rounded-2xl border border-gray-200">
+                          Nenhuma macro área encontrada com o termo "{macroSearch}".
+                        </div>
+                      ) : (
+                        filteredMacroAreas.map((macro) => {
+                          const currentIds = Array.isArray(profile.macro_area_ids) && profile.macro_area_ids.length > 0
+                            ? profile.macro_area_ids
+                            : (profile.macro_area_id ? [Number(profile.macro_area_id)] : []);
+                          const selectedIndex = currentIds.indexOf(macro.macro_area_id);
+                          const isSelected = selectedIndex !== -1;
+                          const badgeLabel = selectedIndex === 0 ? '1ª Área' : selectedIndex === 1 ? '2ª Área' : null;
+                          const IconComponent = ICON_MAP[macro.iconName || macro.icon] || Sparkles;
+
+                          return (
+                            <div
+                              key={macro.macro_area_id}
+                              onClick={() => handleSelectMacroArea(macro)}
+                              className={`p-3 sm:p-3.5 rounded-2xl border-2 cursor-pointer transition-all flex items-start gap-2.5 sm:gap-3 select-none min-w-0 w-full max-w-full box-border ${
+                                isSelected
+                                  ? 'bg-[#FFA900]/15 border-[#FFA900] shadow-sm ring-1 ring-[#FFA900]/30'
+                                  : 'bg-gray-50/80 border-gray-200 hover:border-gray-900 hover:bg-white'
+                              }`}
+                            >
+                              <div
+                                className={`p-2 sm:p-2.5 rounded-xl shrink-0 mt-0.5 transition-colors ${
+                                  isSelected
+                                    ? 'bg-[#FFA900] text-black shadow-sm'
+                                    : 'bg-white text-gray-400 border border-gray-200'
+                                }`}
+                              >
+                                <IconComponent className="h-4 w-4" />
+                              </div>
+
+                              <div className="flex-1 min-w-0 overflow-hidden">
+                                <div className="flex items-start justify-between gap-1.5">
+                                  <span className="text-xs sm:text-sm font-black text-gray-900 leading-tight break-words">
+                                    {macro.name}
+                                  </span>
+                                  {isSelected && (
+                                    <div className="flex items-center gap-1.5 shrink-0 ml-1">
+                                      <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-md bg-gray-900 text-[#FFA900] tracking-wider">
+                                        {badgeLabel}
+                                      </span>
+                                      <span className="h-4 w-4 sm:h-5 sm:w-5 rounded-full bg-[#FFA900] text-black flex items-center justify-center shrink-0">
+                                        <Check className="h-2.5 w-2.5 sm:h-3 sm:w-3 stroke-[3]" />
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+                                <p className="text-[10px] sm:text-[11px] text-gray-500 font-medium line-clamp-2 mt-1 leading-snug break-words">
+                                  {macro.description}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
                   </div>
 
                   <div className="sm:col-span-2">
@@ -1421,9 +1673,12 @@ export default function InterviewScreen({ embedded = false }) {
                       👤
                     </div>
                     <div>
-                      <h4 className="font-black text-sm text-gray-900">1. Cadastro Imediato sem Senha</h4>
+                      <h4 className="font-black text-sm text-gray-900">1. Cadastro Imediato {profile.password ? 'com Senha' : 'sem Senha'}</h4>
                       <p className="text-xs text-gray-600 mt-0.5">
-                        Sua conta de aluno será criada para <strong>{profile.name}</strong> ({profile.email}), vinculado a <strong>{profile.college_name}</strong> ({profile.course_name}, {profile.period}º período).
+                        Sua conta de aluno será criada para <strong>{profile.name}</strong> ({profile.email}), vinculado a <strong>{profile.college_name}</strong> ({profile.course_name}, {profile.period}º período)
+                        {(profile.respondent_macro_area || profile.respondent_secondary_macro_area) && (
+                          <> • Habilidades práticas: <strong className="text-[#FFA900] bg-gray-900 px-2 py-0.5 rounded-md inline-block font-black text-[11px] ml-1">{[profile.respondent_macro_area, profile.respondent_secondary_macro_area].filter(Boolean).join(' • ')}</strong></>
+                        )}.
                       </p>
                     </div>
                   </div>

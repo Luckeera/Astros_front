@@ -1,10 +1,45 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { X, Sparkles, Check, AlertCircle, Rocket, Layers, Search, FileText, Briefcase } from 'lucide-react';
+import { 
+  X, 
+  Sparkles, 
+  Check, 
+  AlertCircle, 
+  Search, 
+  Briefcase,
+  Code2,
+  Palette,
+  Binary,
+  TrendingUp,
+  Target,
+  Video,
+  Cpu,
+  HeartPulse,
+  Scale,
+  GraduationCap,
+  Users,
+  Sprout
+} from 'lucide-react';
 import OrbitIcon from '../icons/OrbitIcon';
 import { useAuth } from '../context/AuthContext';
-import { postService, courseService, projectService } from '../services/api';
-import { MASTER_COURSES } from '../services/coursesData';
+import { postService, projectService, macroAreaService } from '../services/api';
+import { OFFICIAL_MACRO_AREAS } from '../services/macroAreasData';
 import { useNavigate } from 'react-router-dom';
+
+const ICON_MAP = {
+  Code2,
+  Palette,
+  Binary,
+  TrendingUp,
+  Target,
+  Video,
+  Cpu,
+  HeartPulse,
+  Scale,
+  GraduationCap,
+  Users,
+  Sprout,
+  Sparkles
+};
 
 export default function CreatePostModal({
   isOpen,
@@ -17,32 +52,31 @@ export default function CreatePostModal({
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [isCollaborative, setIsCollaborative] = useState(false);
-  const [availableCourses, setAvailableCourses] = useState([]);
-  const [selectedCourseIds, setSelectedCourseIds] = useState([]);
+  const [availableMacroAreas, setAvailableMacroAreas] = useState(OFFICIAL_MACRO_AREAS);
+  const [selectedMacroAreaIds, setSelectedMacroAreaIds] = useState([]);
   const [userProjects, setUserProjects] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState('');
-  const [courseSearch, setCourseSearch] = useState('');
+  const [macroSearch, setMacroSearch] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
-  // Carrega cursos e projetos do usuário ao abrir o modal
+  // Carrega macro áreas e projetos do usuário ao abrir o modal
   useEffect(() => {
     if (!isOpen) return;
     setError(null);
-    setCourseSearch('');
+    setMacroSearch('');
 
-    const fetchCourses = async () => {
+    const fetchMacroAreas = async () => {
       try {
-        const data = await courseService.getCourses(token);
+        const data = await macroAreaService.getMacroAreas();
         if (Array.isArray(data) && data.length > 0) {
-          setAvailableCourses(data);
+          setAvailableMacroAreas(data);
         } else {
-          // Fallback robusto para o catálogo mestre nacional de 165 cursos
-          setAvailableCourses(MASTER_COURSES.map((c, i) => ({ course_id: i + 1, ...c })));
+          setAvailableMacroAreas(OFFICIAL_MACRO_AREAS);
         }
       } catch (err) {
-        console.error('Erro ao carregar cursos:', err);
-        setAvailableCourses(MASTER_COURSES.map((c, i) => ({ course_id: i + 1, ...c })));
+        console.error('Erro ao carregar macro áreas:', err);
+        setAvailableMacroAreas(OFFICIAL_MACRO_AREAS);
       }
     };
 
@@ -57,7 +91,7 @@ export default function CreatePostModal({
       }
     };
 
-    fetchCourses();
+    fetchMacroAreas();
     fetchProjects();
   }, [isOpen, token, user?.user_id]);
 
@@ -71,43 +105,23 @@ export default function CreatePostModal({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  const toggleCourse = (courseId) => {
-    setSelectedCourseIds(prev =>
-      prev.includes(courseId)
-        ? prev.filter(id => id !== courseId)
-        : [...prev, courseId]
+  const toggleMacroArea = (macroAreaId) => {
+    setSelectedMacroAreaIds(prev =>
+      prev.includes(macroAreaId)
+        ? prev.filter(id => id !== macroAreaId)
+        : [...prev, macroAreaId]
     );
   };
 
-  const toggleArea = (areaName, areaCourses) => {
-    const areaCourseIds = areaCourses.map(c => c.course_id);
-    const allSelected = areaCourseIds.every(id => selectedCourseIds.includes(id));
-
-    if (allSelected) {
-      setSelectedCourseIds(prev => prev.filter(id => !areaCourseIds.includes(id)));
-    } else {
-      setSelectedCourseIds(prev => [...new Set([...prev, ...areaCourseIds])]);
-    }
-  };
-
-  // Filtragem e agrupamento de cursos por área
-  const filteredCourses = useMemo(() => {
-    if (!courseSearch.trim()) return availableCourses;
-    const term = courseSearch.toLowerCase().trim();
-    return availableCourses.filter(c =>
-      c.name.toLowerCase().includes(term) ||
-      (c.area && c.area.toLowerCase().includes(term))
+  // Filtragem de Macro Áreas por busca
+  const filteredMacroAreas = useMemo(() => {
+    if (!macroSearch.trim()) return availableMacroAreas;
+    const term = macroSearch.toLowerCase().trim();
+    return availableMacroAreas.filter(m =>
+      m.name.toLowerCase().includes(term) ||
+      (m.description && m.description.toLowerCase().includes(term))
     );
-  }, [availableCourses, courseSearch]);
-
-  const coursesByArea = useMemo(() => {
-    return filteredCourses.reduce((acc, course) => {
-      const area = course.area || 'Outros';
-      if (!acc[area]) acc[area] = [];
-      acc[area].push(course);
-      return acc;
-    }, {});
-  }, [filteredCourses]);
+  }, [availableMacroAreas, macroSearch]);
 
   if (!isOpen) return null;
 
@@ -150,7 +164,7 @@ export default function CreatePostModal({
         created = await postService.createCollabPost(token, selectedProjectId, {
           title: title.trim(),
           content: content.trim(),
-          target_courses: selectedCourseIds
+          target_macro_areas: selectedMacroAreaIds
         });
       } else {
         created = await postService.createPost(token, {
@@ -158,7 +172,7 @@ export default function CreatePostModal({
           content: content.trim(),
           is_collaborative: false,
           project_id: selectedProjectId ? Number(selectedProjectId) : null,
-          target_courses: selectedCourseIds
+          target_macro_areas: selectedMacroAreaIds
         });
       }
 
@@ -173,7 +187,7 @@ export default function CreatePostModal({
       setTitle('');
       setContent('');
       setIsCollaborative(false);
-      setSelectedCourseIds([]);
+      setSelectedMacroAreaIds([]);
       setSelectedProjectId('');
       onClose();
     } catch (err) {
@@ -189,7 +203,7 @@ export default function CreatePostModal({
       {/* Clique no backdrop para fechar */}
       <div className="fixed inset-0" onClick={onClose} />
 
-      {/* Modal mais largo (max-w-4xl) com visual reformulado */}
+      {/* Modal responsivo com visual arrojado */}
       <div className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden my-auto z-10 animate-in zoom-in-95 duration-200 max-h-[92vh] flex flex-col">
         {/* Header do Modal */}
         <div className="p-6 sm:p-8 border-b border-gray-100 bg-[#FAF9F6] flex items-center justify-between">
@@ -202,7 +216,7 @@ export default function CreatePostModal({
               Publicar no Feed
             </h2>
             <p className="text-xs sm:text-sm text-gray-500 font-medium mt-1">
-              Compartilhe pesquisas, ideias ou vincule seus projetos para direcionar aos cursos de interesse.
+              Compartilhe ideias, pesquisas ou pitches direcionados por competências práticas.
             </p>
           </div>
 
@@ -231,68 +245,49 @@ export default function CreatePostModal({
                 <label className="text-xs font-black uppercase tracking-wider text-gray-900">
                   Título da Publicação *
                 </label>
-                <span className="text-[11px] font-bold text-gray-400">
+                <span className={`text-[10px] font-bold ${title.length > 150 ? 'text-red-500' : 'text-gray-400'}`}>
                   {title.length}/150
                 </span>
               </div>
               <input
                 type="text"
+                placeholder="Ex: Desenvolvendo sistema de visão computacional para drones..."
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="O que o mundo acadêmico deve saber hoje?"
                 maxLength={150}
                 required
-                className="w-full px-4 py-3.5 bg-gray-50/70 border-2 border-gray-200 rounded-xl font-bold text-sm text-gray-900 focus:bg-white focus:border-[#FFA900] outline-none transition-all"
+                className="w-full px-4 py-3 bg-gray-50/70 border border-gray-200 rounded-2xl font-bold text-gray-900 text-sm focus:bg-white focus:border-[#FFA900] outline-none transition-all placeholder:text-gray-400"
               />
             </div>
 
-            {/* Conteúdo do Post */}
+            {/* Conteúdo / Pitch */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="text-xs font-black uppercase tracking-wider text-gray-900">
-                  Corpo do Artigo / Projeto *
+                  Descrição detalhada *
                 </label>
-                <span className="text-[11px] font-bold text-gray-400">
+                <span className={`text-[10px] font-bold ${content.length > 5000 ? 'text-red-500' : 'text-gray-400'}`}>
                   {content.length}/5000
                 </span>
               </div>
               <textarea
+                placeholder="Descreva sua ideia, objetivo, o que já foi feito e o que você precisa..."
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                placeholder="Articule suas ideias, hipóteses ou necessidades de colaboração..."
                 rows={5}
                 maxLength={5000}
                 required
-                className="w-full px-4 py-3.5 bg-gray-50/70 border-2 border-gray-200 rounded-xl font-medium text-sm text-gray-800 focus:bg-white focus:border-[#FFA900] outline-none transition-all resize-none leading-relaxed"
+                className="w-full px-4 py-3 bg-gray-50/70 border border-gray-200 rounded-2xl font-medium text-gray-800 text-sm focus:bg-white focus:border-[#FFA900] outline-none transition-all placeholder:text-gray-400 resize-y"
               />
             </div>
 
-            {/* Seção de Vínculo de Projeto (Disponível para qualquer post) */}
-            <div className="p-5 rounded-2xl bg-gray-50/80 border border-gray-200 space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="p-1.5 bg-[#FFA900]/20 rounded-lg text-black">
-                    <Briefcase className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <label className="text-xs font-black uppercase tracking-wider text-gray-900 block">
-                      Vincular a um Projeto (Opcional)
-                    </label>
-                    <p className="text-[11px] text-gray-500 font-medium">
-                      O post exibirá um atalho direto para a tela de documentação do seu projeto.
-                    </p>
-                  </div>
-                </div>
-
-                {selectedProjectId && (
-                  <button
-                    type="button"
-                    onClick={() => setSelectedProjectId('')}
-                    className="text-[10px] font-black text-gray-400 hover:text-red-500 uppercase tracking-wider transition-colors"
-                  >
-                    Desvincular
-                  </button>
-                )}
+            {/* Vínculo de Projeto */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-gray-50/70 border border-gray-200 space-y-3">
+              <div className="flex items-center gap-2">
+                <Briefcase className="h-4 w-4 text-[#FFA900]" />
+                <label className="text-xs font-black uppercase tracking-wider text-gray-900">
+                  Vincular a um Projeto (Opcional)
+                </label>
               </div>
 
               {userProjects.length > 0 ? (
@@ -355,87 +350,81 @@ export default function CreatePostModal({
               </div>
             </div>
 
-            {/* Cursos Alvo com Busca Rápida e Catálogo Completo */}
+            {/* Macro Áreas Alvo com Seleção de Habilidades */}
             <div>
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
                 <div>
-                  <h4 className="text-xs font-black uppercase tracking-wider text-gray-900">
-                    Cursos Alvo (Onde seu post aparecerá)
+                  <h4 className="text-xs font-black uppercase tracking-wider text-gray-900 flex items-center gap-2">
+                    <Target className="h-4 w-4 text-[#FFA900]" />
+                    Macro Áreas de Habilidades Alvo
                   </h4>
                   <p className="text-[11px] text-gray-500 font-medium">
-                    Se nenhum curso for selecionado, seu post ficará visível para todos os cursos do campus.
+                    Selecione quais competências práticas seu post busca (ou deixe livre para o campus inteiro).
                   </p>
                 </div>
-                {selectedCourseIds.length > 0 && (
+                {selectedMacroAreaIds.length > 0 && (
                   <button
                     type="button"
-                    onClick={() => setSelectedCourseIds([])}
+                    onClick={() => setSelectedMacroAreaIds([])}
                     className="text-[10px] font-black text-gray-400 hover:text-red-500 uppercase tracking-wider transition-colors self-start sm:self-auto"
                   >
-                    Limpar Seleção ({selectedCourseIds.length})
+                    Limpar Seleção ({selectedMacroAreaIds.length})
                   </button>
                 )}
               </div>
 
-              {/* Barra de Pesquisa de Cursos */}
+              {/* Barra de Pesquisa de Macro Áreas */}
               <div className="relative mb-3">
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Pesquisar curso ou área..."
-                  value={courseSearch}
-                  onChange={(e) => setCourseSearch(e.target.value)}
+                  placeholder="Filtrar por habilidade ou área prática (ex: Software, Design, Dados)..."
+                  value={macroSearch}
+                  onChange={(e) => setMacroSearch(e.target.value)}
                   className="w-full pl-9 pr-4 py-2.5 bg-gray-50/70 border border-gray-200 rounded-xl text-xs font-medium text-gray-800 placeholder:text-gray-400 focus:bg-white focus:border-[#FFA900] outline-none transition-all"
                 />
               </div>
 
-              <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
-                {Object.keys(coursesByArea).length > 0 ? (
-                  Object.entries(coursesByArea).map(([area, courses]) => {
-                    const areaCourseIds = courses.map(c => c.course_id);
-                    const isAreaSelected = areaCourseIds.every(id => selectedCourseIds.includes(id));
+              {/* Grid de Macro Áreas */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-72 overflow-y-auto pr-1">
+                {filteredMacroAreas.map((macro) => {
+                  const isSelected = selectedMacroAreaIds.includes(macro.macro_area_id);
+                  const IconComponent = ICON_MAP[macro.iconName || macro.icon] || Sparkles;
 
-                    return (
-                      <div key={area} className="bg-gray-50/70 p-3.5 rounded-2xl border border-gray-200/70">
-                        <button
-                          type="button"
-                          onClick={() => toggleArea(area, courses)}
-                          className={`text-[10px] font-black uppercase tracking-wider mb-2.5 flex items-center gap-1.5 transition-colors ${
-                            isAreaSelected ? 'text-[#FFA900]' : 'text-gray-500 hover:text-gray-900'
-                          }`}
-                        >
-                          <Layers className="h-3 w-3" />
-                          Área: {area} {isAreaSelected ? '(Toda selecionada)' : '(Selecionar tudo)'}
-                        </button>
-
-                        <div className="flex flex-wrap gap-1.5">
-                          {courses.map(course => {
-                            const isSelected = selectedCourseIds.includes(course.course_id);
-                            return (
-                              <button
-                                key={course.course_id}
-                                type="button"
-                                onClick={() => toggleCourse(course.course_id)}
-                                className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all flex items-center gap-1.5 border-2 ${
-                                  isSelected
-                                    ? 'bg-[#FFA900]/15 border-[#FFA900] text-gray-900 shadow-sm'
-                                    : 'bg-white border-gray-200 text-gray-600 hover:border-gray-400'
-                                }`}
-                              >
-                                {isSelected && <Check className="h-3 w-3 text-[#FFA900]" />}
-                                {course.name}
-                              </button>
-                            );
-                          })}
-                        </div>
+                  return (
+                    <div
+                      key={macro.macro_area_id}
+                      onClick={() => toggleMacroArea(macro.macro_area_id)}
+                      className={`p-3.5 rounded-2xl border-2 cursor-pointer transition-all flex items-start gap-3 select-none ${
+                        isSelected
+                          ? 'bg-[#FFA900]/15 border-[#FFA900] shadow-sm'
+                          : 'bg-gray-50/80 border-gray-200 hover:border-gray-300 hover:bg-white'
+                      }`}
+                    >
+                      <div className={`p-2 rounded-xl shrink-0 mt-0.5 transition-colors ${
+                        isSelected ? 'bg-[#FFA900] text-black' : 'bg-white text-gray-400 border border-gray-100'
+                      }`}>
+                        <IconComponent className="h-4 w-4" />
                       </div>
-                    );
-                  })
-                ) : (
-                  <div className="p-4 text-center text-gray-400 text-xs font-bold">
-                    Nenhum curso encontrado para "{courseSearch}".
-                  </div>
-                )}
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-xs font-black text-gray-900 leading-tight">
+                            {macro.name}
+                          </span>
+                          {isSelected && (
+                            <span className="h-4 w-4 rounded-full bg-[#FFA900] text-black flex items-center justify-center shrink-0">
+                              <Check className="h-3 w-3 stroke-[3]" />
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[10px] text-gray-500 font-medium line-clamp-2 mt-1 leading-snug">
+                          {macro.description}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </form>
@@ -454,19 +443,16 @@ export default function CreatePostModal({
           <button
             type="submit"
             form="create-post-form"
-            disabled={isSubmitting || !user}
-            className="px-7 py-3 bg-[#FFA900] text-black font-black text-xs uppercase tracking-wider rounded-xl hover:bg-gray-900 hover:text-white transition-all shadow-md flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isSubmitting}
+            className="px-7 py-3 rounded-xl bg-gray-900 text-white font-black text-xs uppercase tracking-wider hover:bg-[#FFA900] hover:text-black transition-all shadow-lg active:scale-95 disabled:opacity-50 disabled:pointer-events-none flex items-center gap-2"
           >
             {isSubmitting ? (
               <>
-                <div className="h-4 w-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
-                Publicando...
+                <div className="w-3.5 h-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                <span>Publicando...</span>
               </>
             ) : (
-              <>
-                <Rocket className="h-4 w-4" />
-                Publicar Post
-              </>
+              <span>Publicar</span>
             )}
           </button>
         </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   AlertCircle, 
   Sparkles, 
@@ -13,12 +13,15 @@ import {
   Mail,
   Lock,
   User,
-  Layers
+  Layers,
+  Target
 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import OrbitIcon from '../icons/OrbitIcon';
 import { UNIFIED_AREAS, MASTER_COURSES, detectAreaForCourse } from '../services/coursesData';
+import { OFFICIAL_MACRO_AREAS } from '../services/macroAreasData';
+import { macroAreaService } from '../services/api';
 
 export default function LoginScreen() {
   const { login, register } = useAuth();
@@ -42,9 +45,18 @@ export default function LoginScreen() {
   const [registerCollege, setRegisterCollege] = useState('');
   const [registerCourse, setRegisterCourse] = useState('');
   const [registerArea, setRegisterArea] = useState('Tecnologia');
+  const [registerMacroAreaId, setRegisterMacroAreaId] = useState('');
+  const [registerSecondaryMacroAreaId, setRegisterSecondaryMacroAreaId] = useState('');
+  const [macroAreasList, setMacroAreasList] = useState(OFFICIAL_MACRO_AREAS);
   const [registerPeriod, setRegisterPeriod] = useState(1);
   const [registerPassword, setRegisterPassword] = useState('');
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
+
+  useEffect(() => {
+    macroAreaService.getMacroAreas().then(data => {
+      if (Array.isArray(data) && data.length > 0) setMacroAreasList(data);
+    }).catch(() => setMacroAreasList(OFFICIAL_MACRO_AREAS));
+  }, []);
 
   // Estados de Carregamento e Erro
   const [loading, setLoading] = useState(false);
@@ -105,6 +117,8 @@ export default function LoginScreen() {
         college_name: registerCollege.trim() || undefined,
         course_name: registerCourse.trim() || undefined,
         course_area: registerArea || undefined,
+        macro_area_id: registerMacroAreaId ? Number(registerMacroAreaId) : undefined,
+        secondary_macro_area_id: registerSecondaryMacroAreaId ? Number(registerSecondaryMacroAreaId) : undefined,
         period: Number(registerPeriod) || 1
       });
 
@@ -386,6 +400,53 @@ export default function LoginScreen() {
               <p className="text-[10px] text-gray-400 font-medium mt-1 ml-1">
                 Usada para direcionar pitches de projetos e colaborações multidisciplinares no seu feed.
               </p>
+            </div>
+
+            {/* Macro Áreas de Habilidades Práticas (Suporte a até 2) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[11px] font-black text-gray-700 uppercase tracking-wider mb-1 ml-1 flex items-center gap-1.5">
+                  <Target className="h-3.5 w-3.5 text-[#FFA900]" />
+                  1ª Habilidade Prática
+                </label>
+                <div className="relative flex items-center">
+                  <select
+                    value={registerMacroAreaId}
+                    onChange={e => setRegisterMacroAreaId(e.target.value)}
+                    className="w-full pl-3 pr-8 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl outline-none focus:border-gray-900 focus:bg-white transition-all font-bold text-xs text-gray-900 appearance-none cursor-pointer"
+                  >
+                    <option value="">1ª Habilidade...</option>
+                    {macroAreasList.map(m => (
+                      <option key={m.macro_area_id} value={m.macro_area_id}>
+                        {m.name}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-3 pointer-events-none text-gray-400 text-xs">▼</div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-black text-gray-700 uppercase tracking-wider mb-1 ml-1 flex items-center gap-1.5">
+                  <Target className="h-3.5 w-3.5 text-gray-400" />
+                  2ª Habilidade (opcional)
+                </label>
+                <div className="relative flex items-center">
+                  <select
+                    value={registerSecondaryMacroAreaId}
+                    onChange={e => setRegisterSecondaryMacroAreaId(e.target.value)}
+                    className="w-full pl-3 pr-8 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl outline-none focus:border-gray-900 focus:bg-white transition-all font-bold text-xs text-gray-900 appearance-none cursor-pointer"
+                  >
+                    <option value="">Nenhuma (Apenas 1)</option>
+                    {macroAreasList.filter(m => m.macro_area_id !== Number(registerMacroAreaId)).map(m => (
+                      <option key={m.macro_area_id} value={m.macro_area_id}>
+                        {m.name}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-3 pointer-events-none text-gray-400 text-xs">▼</div>
+                </div>
+              </div>
             </div>
 
             {/* Período e Senha */}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, MessageSquare, X, Heart, FileText } from 'lucide-react';
+import { ChevronLeft, MessageSquare, X, Heart, FileText, Target } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { postService } from '../services/api';
@@ -120,6 +120,22 @@ const PostDetailScreen = ({ onBack }) => {
               </button>
             )}
           </div>
+
+          {post.target_macro_areas && post.target_macro_areas.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 mb-6">
+              <span className="text-xs font-black uppercase tracking-wider text-gray-400 mr-1 flex items-center gap-1.5">
+                <Target className="h-4 w-4 text-[#FFA900]" /> Habilidades Buscadas:
+              </span>
+              {post.target_macro_areas.map((m) => (
+                <span 
+                  key={m.macro_area_id}
+                  className="px-3 py-1.5 bg-amber-50 text-amber-900 border border-amber-300 rounded-xl text-xs font-black tracking-tight shadow-sm"
+                >
+                  {m.name}
+                </span>
+              ))}
+            </div>
+          )}
 
           <h1 className="text-4xl sm:text-5xl font-black text-gray-900 tracking-tighter mb-8 leading-[1.1]">{post.title}</h1>
           <div className="bg-gray-50/50 p-10 rounded-3xl border border-gray-100 mb-8 shadow-inner">

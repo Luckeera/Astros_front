@@ -32,14 +32,6 @@ export default function LandingPage() {
 
       {/* --- HERO: Apresentação da Ideia do Astros --- */}
       <section className="pt-12 md:pt-20 pb-16 px-6 max-w-6xl mx-auto text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#FFA900]/10 text-gray-900 font-black text-xs sm:text-sm mb-6 border border-[#FFA900]/30 shadow-sm animate-in fade-in slide-in-from-top-4 duration-500">
-          <span className="relative flex h-2.5 w-2.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FFA900] opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#FFA900]"></span>
-          </span>
-          Rede Social Acadêmica & Colaboração Interdisciplinar
-        </div>
-
         <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight leading-[1.15] text-gray-900 mb-6 max-w-5xl mx-auto">
           Tire seus projetos do papel com quem tem as{' '}
           <span className="relative inline-block px-3.5 py-1 bg-[#FFA900] text-gray-900 rounded-2xl shadow-sm -rotate-1 mx-1">

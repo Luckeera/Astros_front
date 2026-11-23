@@ -1,3 +1,5 @@
+import { OFFICIAL_MACRO_AREAS } from './macroAreasData';
+
 export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 export const THEME_COLOR = '#FFA900';
 
@@ -36,10 +38,11 @@ export const postService = {
   },
 
   async createPost(token, postData) {
-    const { target_courses, ...rest } = postData;
+    const { target_courses, target_macro_areas, ...rest } = postData;
     const dataToSend = {
       ...rest,
-      target_course_ids: target_courses || []
+      target_course_ids: target_courses || [],
+      target_macro_area_ids: target_macro_areas || []
     };
     
     const response = await fetch(`${API_BASE_URL}/posts/`, {
@@ -52,10 +55,11 @@ export const postService = {
   },
 
   async createCollabPost(token, projectId, postData) {
-    const { target_courses, ...rest } = postData;
+    const { target_courses, target_macro_areas, ...rest } = postData;
     const dataToSend = {
       ...rest,
       target_course_ids: target_courses || [],
+      target_macro_area_ids: target_macro_areas || [],
       is_collaborative: true
     };
     
@@ -337,6 +341,34 @@ export const userService = {
       headers: getHeaders(token),
     });
     return response.json();
+  },
+
+  async updateProfile(token, userId, userData) {
+    const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+      method: 'PATCH',
+      headers: getHeaders(token),
+      body: JSON.stringify(userData),
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.detail || 'Falha ao atualizar perfil.');
+    }
+    return response.json();
+  }
+};
+
+export const macroAreaService = {
+  async getMacroAreas() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/macro-areas`);
+      if (response.ok) {
+        const data = await response.json();
+        if (Array.isArray(data) && data.length > 0) return data;
+      }
+    } catch (e) {
+      console.warn('Usando catálogo local de macro áreas como fallback:', e);
+    }
+    return OFFICIAL_MACRO_AREAS;
   }
 };
 

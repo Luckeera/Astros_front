@@ -34,12 +34,19 @@ const Navbar = ({ showMural = true }) => {
       <div className="max-w-5xl mx-auto px-4 flex justify-between h-24 items-center">
         <Link 
           to={user ? "/feed" : "/"} 
-          className="flex items-center gap-4 cursor-pointer group"
+          className="flex items-center gap-3 sm:gap-4 cursor-pointer group"
         >
-          <div className="p-2.5 bg-[#FFA900]/10 rounded-2xl border border-[#FFA900]/20 shadow-sm group-hover:bg-[#FFA900] transition-all duration-500 group-hover:shadow-xl group-hover:shadow-[#FFA900]/40 overflow-hidden">
-            <OrbitIcon className="h-10 w-10 text-[#FFA900] group-hover:text-black transition-colors animate-orbit" />
+          <div className="p-2 sm:p-2.5 bg-[#FFA900]/10 rounded-2xl border border-[#FFA900]/20 shadow-sm group-hover:bg-[#FFA900] transition-all duration-500 group-hover:shadow-xl group-hover:shadow-[#FFA900]/40 overflow-hidden shrink-0">
+            <OrbitIcon className="h-8 w-8 sm:h-10 sm:w-10 text-[#FFA900] group-hover:text-black transition-colors animate-orbit" />
           </div>
-          <span className="text-4xl font-black text-gray-900 tracking-tighter group-hover:text-[#FFA900] transition-colors">astros.</span>
+          <div className="flex flex-col">
+            <span className="text-2xl sm:text-4xl font-black text-gray-900 tracking-tighter group-hover:text-[#FFA900] transition-colors leading-none">
+              astros.
+            </span>
+            <span className="text-[9px] sm:text-[11px] font-black uppercase tracking-wider text-gray-400 group-hover:text-gray-700 transition-colors mt-0.5 sm:mt-1 leading-none">
+              Colaboração Interdisciplinar
+            </span>
+          </div>
         </Link>
 
         <div className="flex items-center gap-3 relative" ref={menuRef}>

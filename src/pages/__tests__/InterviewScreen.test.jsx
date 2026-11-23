@@ -47,6 +47,9 @@ vi.mock('../../services/api', () => ({
       created_project_ids: [10, 11],
       invites_sent_count: 0
     })
+  },
+  macroAreaService: {
+    getMacroAreas: vi.fn().mockResolvedValue([])
   }
 }));
 
@@ -180,5 +183,58 @@ describe('InterviewScreen Component', () => {
     expect(sentPayload.proposed_projects).toHaveLength(2);
     expect(sentPayload.proposed_projects[0].name).toBe('Meu Projeto Próprio');
     expect(sentPayload.wants_to_create_project).toBe(true);
+  });
+
+  it('permite buscar e selecionar até 2 macro áreas por card, respeitando o limite máximo', async () => {
+    render(
+      <BrowserRouter>
+        <InterviewScreen />
+      </BrowserRouter>
+    );
+
+    // Deve exibir o título da seção de macro área
+    expect(screen.getByText(/Macro Áreas de Habilidades Práticas/i)).toBeInTheDocument();
+    expect(screen.getByText(/Escolha até 2/i)).toBeInTheDocument();
+
+    // Deve permitir filtrar pelo campo de busca
+    const searchInput = screen.getByPlaceholderText(/Filtrar por habilidade ou área prática/i);
+    fireEvent.change(searchInput, { target: { value: 'Design' } });
+
+    // Encontra o card de Design
+    const designCard = screen.getByText(/Design, UI\/UX & Criatividade Visual/i);
+    expect(designCard).toBeInTheDocument();
+
+    // Clica para selecionar a 1ª macro área
+    fireEvent.click(designCard);
+    expect(screen.getByText(/1ª Área/i)).toBeInTheDocument();
+    expect(screen.getByText(/1\/2 selecionada/i)).toBeInTheDocument();
+
+    // Limpa a busca para achar outra área
+    fireEvent.change(searchInput, { target: { value: 'Software' } });
+    const softwareCard = screen.getByText(/Desenvolvimento de Software & TI/i);
+    expect(softwareCard).toBeInTheDocument();
+
+    // Clica para selecionar a 2ª macro área
+    fireEvent.click(softwareCard);
+    expect(screen.getByText(/2ª Área/i)).toBeInTheDocument();
+    expect(screen.getByText(/2\/2 selecionadas/i)).toBeInTheDocument();
+
+    // Tenta selecionar uma 3ª macro área (ex: Dados)
+    fireEvent.change(searchInput, { target: { value: 'Dados' } });
+    const dadosCard = screen.getByText(/Dados, Inteligência Artificial & Analytics/i);
+    fireEvent.click(dadosCard);
+
+    // Deve exibir aviso amigável de limite máximo de 2
+    expect(screen.getByText(/Você já selecionou o limite máximo de 2 macro áreas práticas/i)).toBeInTheDocument();
+
+    // Botão Limpar Seleção deve estar visível
+    const clearBtn = screen.getByRole('button', { name: /Limpar Seleção/i });
+    expect(clearBtn).toBeInTheDocument();
+
+    // Clica no botão Limpar Seleção
+    fireEvent.click(clearBtn);
+    expect(screen.queryByText(/1ª Área/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/2ª Área/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/Escolha até 2/i)).toBeInTheDocument();
   });
 });

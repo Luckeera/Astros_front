@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, Heart, MessageSquare, FileText } from 'lucide-react';
+import { Sparkles, Heart, MessageSquare, FileText, Target } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { postService } from '../services/api';
 import ContributionModal from './ContributionModal';
@@ -90,6 +90,22 @@ const PostCard = ({ post, onNavigateToDetail }) => {
             <FileText className="h-3.5 w-3.5 text-[#FFA900] group-hover/proj:text-black transition-colors" />
             <span>Projeto: {post.project_name || 'Ver Documentação'}</span>
             <span className="text-[10px] text-gray-500 group-hover/proj:text-black transition-colors font-bold">Documentação Oficial →</span>
+          </div>
+        )}
+
+        {post.target_macro_areas && post.target_macro_areas.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1.5 mb-3">
+            <span className="text-[10px] font-black uppercase tracking-wider text-gray-400 mr-1 flex items-center gap-1">
+              <Target className="h-3 w-3 text-[#FFA900]" /> Busca:
+            </span>
+            {post.target_macro_areas.map((m) => (
+              <span 
+                key={m.macro_area_id}
+                className="px-2.5 py-1 bg-amber-50 text-amber-900 border border-amber-200/80 rounded-lg text-[10px] font-black tracking-tight"
+              >
+                {m.name}
+              </span>
+            ))}
           </div>
         )}
 
