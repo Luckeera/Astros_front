@@ -25,6 +25,13 @@ vi.mock('../../services/api', () => ({
   },
   projectService: {
     getUserProjects: vi.fn()
+  },
+  macroAreaService: {
+    getMacroAreas: vi.fn().mockResolvedValue([
+      { macro_area_id: 1, name: 'Desenvolvimento de Software & TI', description: 'Código e infra' },
+      { macro_area_id: 2, name: 'Design, UI/UX & Criatividade Visual', description: 'Design e protótipos' },
+      { macro_area_id: 8, name: 'Saúde, Biológicas & Bem-Estar', description: 'Saúde e bio' }
+    ])
   }
 }));
 
@@ -58,26 +65,26 @@ describe('CreatePostModal Component', () => {
     render(<CreatePostModal isOpen={true} onClose={vi.fn()} />);
 
     expect(screen.getByRole('heading', { name: /Publicar no Feed|Nova Publicação/i })).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/O que o mundo acadêmico deve saber hoje|Título da sua publicação/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/Articule suas ideias|Descreva sua hipótese/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/Desenvolvendo sistema|Título da sua publicação/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/Descreva sua ideia/i)).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(screen.getByText('Engenharia de Software')).toBeInTheDocument();
+      expect(screen.getByText('Desenvolvimento de Software & TI')).toBeInTheDocument();
     });
   });
 
-  it('deve permitir selecionar e desselecionar cursos alvo', async () => {
+  it('deve permitir selecionar e desselecionar macro áreas alvo', async () => {
     render(<CreatePostModal isOpen={true} onClose={vi.fn()} />);
 
     await waitFor(() => {
-      expect(screen.getByText('Engenharia de Software')).toBeInTheDocument();
+      expect(screen.getByText('Desenvolvimento de Software & TI')).toBeInTheDocument();
     });
 
-    const courseBtn = screen.getByText('Engenharia de Software');
-    fireEvent.click(courseBtn);
+    const macroBtn = screen.getByText('Desenvolvimento de Software & TI');
+    fireEvent.click(macroBtn);
 
-    // O curso agora deve estar selecionado
-    expect(courseBtn.closest('button')).toHaveClass('border-[#FFA900]');
+    // A macro área agora deve estar selecionada
+    expect(macroBtn.closest('div.border-2')).toHaveClass('border-[#FFA900]');
   });
 
   it('deve submeter publicação comum e chamar postService.createPost', async () => {
@@ -85,16 +92,16 @@ describe('CreatePostModal Component', () => {
     render(<CreatePostModal isOpen={true} onClose={vi.fn()} onPostCreated={handleCreated} />);
 
     await waitFor(() => {
-      expect(screen.getByText('Engenharia de Software')).toBeInTheDocument();
+      expect(screen.getByText('Desenvolvimento de Software & TI')).toBeInTheDocument();
     });
 
-    const titleInput = screen.getByPlaceholderText(/O que o mundo acadêmico deve saber hoje|Título da sua publicação/i);
-    const contentInput = screen.getByPlaceholderText(/Articule suas ideias|Descreva sua hipótese/i);
+    const titleInput = screen.getByPlaceholderText(/Desenvolvendo sistema|Título da sua publicação/i);
+    const contentInput = screen.getByPlaceholderText(/Descreva sua ideia/i);
 
     fireEvent.change(titleInput, { target: { value: 'Nova pesquisa em Redes Neurais' } });
     fireEvent.change(contentInput, { target: { value: 'Apresentamos um estudo preliminar sobre otimização de pesos.' } });
 
-    const submitBtn = screen.getByRole('button', { name: /Publicar Post/i });
+    const submitBtn = screen.getByRole('button', { name: /Publicar/i });
     fireEvent.click(submitBtn);
 
     await waitFor(() => {
@@ -129,13 +136,13 @@ describe('CreatePostModal Component', () => {
     const projectSelect = screen.getByRole('combobox');
     fireEvent.change(projectSelect, { target: { value: '10' } });
 
-    const titleInput = screen.getByPlaceholderText(/O que o mundo acadêmico deve saber hoje|Título da sua publicação/i);
-    const contentInput = screen.getByPlaceholderText(/Articule suas ideias|Descreva sua hipótese/i);
+    const titleInput = screen.getByPlaceholderText(/Desenvolvendo sistema|Título da sua publicação/i);
+    const contentInput = screen.getByPlaceholderText(/Descreva sua ideia/i);
 
     fireEvent.change(titleInput, { target: { value: 'Buscamos Desenvolvedores React' } });
     fireEvent.change(contentInput, { target: { value: 'Vagas abertas para o projeto BioSensor 3D.' } });
 
-    const submitBtn = screen.getByRole('button', { name: /Publicar Post/i });
+    const submitBtn = screen.getByRole('button', { name: /Publicar/i });
     fireEvent.click(submitBtn);
 
     await waitFor(() => {
@@ -150,20 +157,20 @@ describe('CreatePostModal Component', () => {
     });
   });
 
-  it('deve permitir filtrar cursos pelo campo de busca', async () => {
+  it('deve permitir filtrar macro áreas pelo campo de busca', async () => {
     render(<CreatePostModal isOpen={true} onClose={vi.fn()} />);
 
     await waitFor(() => {
-      expect(screen.getByText('Engenharia de Software')).toBeInTheDocument();
-      expect(screen.getByText('Medicina')).toBeInTheDocument();
+      expect(screen.getByText('Desenvolvimento de Software & TI')).toBeInTheDocument();
+      expect(screen.getByText('Saúde, Biológicas & Bem-Estar')).toBeInTheDocument();
     });
 
-    const searchInput = screen.getByPlaceholderText(/Pesquisar curso ou área/i);
-    fireEvent.change(searchInput, { target: { value: 'Medicina' } });
+    const searchInput = screen.getByPlaceholderText(/Filtrar por habilidade/i);
+    fireEvent.change(searchInput, { target: { value: 'Saúde' } });
 
     await waitFor(() => {
-      expect(screen.getByText('Medicina')).toBeInTheDocument();
-      expect(screen.queryByText('Engenharia de Software')).not.toBeInTheDocument();
+      expect(screen.getByText('Saúde, Biológicas & Bem-Estar')).toBeInTheDocument();
+      expect(screen.queryByText('Desenvolvimento de Software & TI')).not.toBeInTheDocument();
     });
   });
 
@@ -178,13 +185,13 @@ describe('CreatePostModal Component', () => {
     const projectSelect = screen.getByRole('combobox');
     fireEvent.change(projectSelect, { target: { value: '10' } });
 
-    const titleInput = screen.getByPlaceholderText(/O que o mundo acadêmico deve saber hoje|Título da sua publicação/i);
-    const contentInput = screen.getByPlaceholderText(/Articule suas ideias|Descreva sua hipótese/i);
+    const titleInput = screen.getByPlaceholderText(/Desenvolvendo sistema|Título da sua publicação/i);
+    const contentInput = screen.getByPlaceholderText(/Descreva sua ideia/i);
 
     fireEvent.change(titleInput, { target: { value: 'Artigo sobre Arquitetura do BioSensor' } });
     fireEvent.change(contentInput, { target: { value: 'Confira a documentação completa do projeto.' } });
 
-    const submitBtn = screen.getByRole('button', { name: /Publicar Post/i });
+    const submitBtn = screen.getByRole('button', { name: /Publicar/i });
     fireEvent.click(submitBtn);
 
     await waitFor(() => {

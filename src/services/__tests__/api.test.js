@@ -17,15 +17,15 @@ describe('Serviço Central de API (services/api.js)', () => {
   });
 
   describe('postService', () => {
-    it('getFeed deve chamar o endpoint correto com token', async () => {
+    it('getFeed deve chamar o endpoint correto de macro-area com token', async () => {
       fetch.mockResolvedValueOnce({
         ok: true,
         json: async () => [{ post_id: 1, title: 'Post Teste' }],
       });
 
-      const res = await postService.getFeed('fake-token', 1, 'course');
+      const res = await postService.getFeed('fake-token', 1, 'macro_area', 2);
       expect(fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/posts/course/1'),
+        expect.stringContaining('/posts/macro-area/1?secondary_id=2'),
         expect.objectContaining({
           headers: expect.objectContaining({
             Authorization: 'Bearer fake-token',
@@ -33,6 +33,24 @@ describe('Serviço Central de API (services/api.js)', () => {
         })
       );
       expect(res).toEqual([{ post_id: 1, title: 'Post Teste' }]);
+    });
+
+    it('getFeed deve chamar o endpoint colaborativo de macro-area quando filter for target', async () => {
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => [{ post_id: 2, title: 'Pitch Teste' }],
+      });
+
+      const res = await postService.getFeed('fake-token', 1, 'target');
+      expect(fetch).toHaveBeenCalledWith(
+        expect.stringContaining('/posts/macro-area/1/contributions'),
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: 'Bearer fake-token',
+          }),
+        })
+      );
+      expect(res).toEqual([{ post_id: 2, title: 'Pitch Teste' }]);
     });
 
     it('toggleLike deve fazer POST para toggle-like-post', async () => {
@@ -49,7 +67,7 @@ describe('Serviço Central de API (services/api.js)', () => {
       expect(res.status).toBe('liked');
     });
 
-    it('createPost deve serializar target_course_ids corretamente', async () => {
+    it('createPost deve serializar target_course_ids e target_macro_area_ids corretamente', async () => {
       fetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ post_id: 99, title: 'Novo Post' }),
@@ -69,6 +87,7 @@ describe('Serviço Central de API (services/api.js)', () => {
             title: 'Novo Post',
             content: 'Conteúdo...',
             target_course_ids: [1, 2],
+            target_macro_area_ids: [],
           }),
         })
       );

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { X, Plus, Trash2, Rocket, AlertCircle, CheckCircle2, Sparkles, Briefcase } from 'lucide-react';
+import { X, Plus, Trash2, Rocket, AlertCircle, CheckCircle2, Sparkles, Briefcase, Check } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { projectService } from '../services/api';
+import { projectService, macroAreaService } from '../services/api';
+import { OFFICIAL_MACRO_AREAS } from '../services/macroAreasData';
 
 export default function CreateProjectModal({
   isOpen,
@@ -16,9 +17,23 @@ export default function CreateProjectModal({
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [roles, setRoles] = useState([]);
+  const [macroAreas, setMacroAreas] = useState(OFFICIAL_MACRO_AREAS);
+  const [selectedMacroAreaIds, setSelectedMacroAreaIds] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    if (macroAreaService && typeof macroAreaService.getMacroAreas === 'function') {
+      macroAreaService.getMacroAreas()
+        .then((data) => {
+          if (Array.isArray(data) && data.length > 0) {
+            setMacroAreas(data);
+          }
+        })
+        .catch(() => setMacroAreas(OFFICIAL_MACRO_AREAS));
+    }
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -28,6 +43,25 @@ export default function CreateProjectModal({
         setName(initialData.name || '');
         const desc = initialData.description || initialData.summary || '';
         setDescription(desc);
+
+        // Preenche macro áreas a partir de initialData (por IDs ou por nomes de áreas)
+        if (Array.isArray(initialData.macro_area_ids) && initialData.macro_area_ids.length > 0) {
+          setSelectedMacroAreaIds(initialData.macro_area_ids.map(Number));
+        } else if (Array.isArray(initialData.areas) && initialData.areas.length > 0) {
+          const matchedIds = initialData.areas.map(areaName => {
+            const found = OFFICIAL_MACRO_AREAS.find(m => 
+              m.name.toLowerCase() === areaName.toLowerCase() ||
+              m.name.toLowerCase().includes(areaName.toLowerCase()) ||
+              areaName.toLowerCase().includes(m.name.toLowerCase())
+            );
+            return found ? found.macro_area_id : null;
+          }).filter(Boolean);
+          setSelectedMacroAreaIds(matchedIds.length > 0 ? matchedIds : (user?.macro_area_id ? [Number(user.macro_area_id)] : []));
+        } else if (user?.macro_area_id) {
+          setSelectedMacroAreaIds([Number(user.macro_area_id)]);
+        } else {
+          setSelectedMacroAreaIds([]);
+        }
 
         if (initialData.roles && Array.isArray(initialData.roles)) {
           const prefilledRoles = initialData.roles
@@ -47,9 +81,30 @@ export default function CreateProjectModal({
         setName('');
         setDescription('');
         setRoles([]);
+        if (user?.macro_area_id) {
+          const ids = [Number(user.macro_area_id)];
+          if (user.secondary_macro_area_id) {
+            ids.push(Number(user.secondary_macro_area_id));
+          }
+          setSelectedMacroAreaIds(ids);
+        } else {
+          setSelectedMacroAreaIds([]);
+        }
       }
     }
-  }, [isOpen, initialData]);
+  }, [isOpen, initialData, user?.user_id, user?.macro_area_id, user?.secondary_macro_area_id]);
+
+  const handleToggleMacroArea = (id) => {
+    setSelectedMacroAreaIds(prev => {
+      if (prev.includes(id)) {
+        return prev.filter(item => item !== id);
+      }
+      if (prev.length >= 3) {
+        return [...prev.slice(1), id];
+      }
+      return [...prev, id];
+    });
+  };
 
   // Fechar com a tecla ESC
   useEffect(() => {
@@ -131,6 +186,7 @@ export default function CreateProjectModal({
       const payload = {
         name: name.trim(),
         description: description.trim(),
+        macro_area_ids: selectedMacroAreaIds,
         roles: roles.map(r => ({
           role_name: r.title.trim(),
           role_quantity: Number(r.quantity) || 1,
@@ -266,6 +322,44 @@ export default function CreateProjectModal({
                 required
                 className="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-xl font-medium text-sm text-gray-900 focus:border-gray-900 outline-none transition-colors resize-none"
               />
+            </div>
+
+            {/* Macro Áreas do Projeto */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <div>
+                  <label className="text-xs font-black uppercase tracking-wider text-gray-900 block">
+                    Macro Áreas do Projeto (Habilidades & Domínios)
+                  </label>
+                  <span className="text-[11px] text-gray-500 font-medium">
+                    Selecione até 3 macro áreas para direcionar e categorizar o projeto no Mural.
+                  </span>
+                </div>
+                <span className="text-[11px] font-bold text-gray-400">
+                  {selectedMacroAreaIds.length}/3
+                </span>
+              </div>
+
+              <div className="flex flex-wrap gap-2 max-h-44 overflow-y-auto p-1 border border-gray-100 rounded-2xl bg-gray-50/50">
+                {macroAreas.map((macro) => {
+                  const isSelected = selectedMacroAreaIds.includes(macro.macro_area_id);
+                  return (
+                    <button
+                      key={macro.macro_area_id}
+                      type="button"
+                      onClick={() => handleToggleMacroArea(macro.macro_area_id)}
+                      className={`px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition-all ${
+                        isSelected
+                          ? 'bg-[#FFA900] text-black border-black shadow-[2px_2px_0px_#000]'
+                          : 'bg-white text-gray-700 border-gray-200 hover:border-gray-900 hover:bg-gray-50'
+                      }`}
+                    >
+                      {isSelected && <Check className="h-3.5 w-3.5 stroke-[3]" />}
+                      <span>{macro.name}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Vagas / Papéis Procurados */}

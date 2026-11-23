@@ -6,23 +6,27 @@
 
 export const MURAL_AREAS = [
   { id: 'all', label: 'Todas as Áreas' },
-  { id: 'Tecnologia', label: 'Tecnologia' },
-  { id: 'Engenharia', label: 'Engenharia' },
-  { id: 'Saúde', label: 'Saúde' },
-  { id: 'Direito', label: 'Direito' },
-  { id: 'Negócios', label: 'Negócios' },
-  { id: 'Design', label: 'Design' },
-  { id: 'Comunicação', label: 'Comunicação' },
-  { id: 'Humanidades & Educação', label: 'Humanas' },
-  { id: 'Ciências Agrárias & Ambientais', label: 'Agrárias & Ambientais' },
+  { id: 'Desenvolvimento de Software & TI', label: 'Software & TI' },
+  { id: 'Design, UI/UX & Criatividade Visual', label: 'Design & UI/UX' },
+  { id: 'Dados, Inteligência Artificial & Analytics', label: 'Dados & IA' },
+  { id: 'Negócios, Gestão & Estratégia', label: 'Negócios & Gestão' },
+  { id: 'Marketing, Growth & Vendas', label: 'Marketing & Vendas' },
+  { id: 'Comunicação, Mídias & Audiovisual', label: 'Comunicação & Mídia' },
+  { id: 'Engenharia, Hardware & Automação', label: 'Engenharia & Hardware' },
+  { id: 'Saúde, Biológicas & Bem-Estar', label: 'Saúde & Bem-Estar' },
+  { id: 'Direito, Regulação & Políticas Públicas', label: 'Direito & Regulação' },
+  { id: 'Educação, Treinamento & EdTech', label: 'Educação & EdTech' },
+  { id: 'Humanidades, Ciências Sociais & Cultura', label: 'Humanidades & Cultura' },
+  { id: 'Meio Ambiente, Agro & Sustentabilidade (ESG)', label: 'Meio Ambiente & ESG' },
+  { id: 'Multidisciplinar / Outras Habilidades', label: 'Multidisciplinar' },
 ];
 
 export const MURAL_PROJECTS = [
-  // TECNOLOGIA + SAÚDE
+  // TECNOLOGIA + SAÚDE + DADOS
   {
     project_id: 101,
     name: 'CampusVoice: Acessibilidade com IA',
-    areas: ['Tecnologia', 'Saúde'],
+    areas: ['Desenvolvimento de Software & TI', 'Saúde, Biológicas & Bem-Estar', 'Dados, Inteligência Artificial & Analytics'],
     summary: 'Transcrição em tempo real de aulas e navegação acessível no campus para universitários com deficiência visual e auditiva.',
     description: 'O CampusVoice nasceu para combater as barreiras diárias de acessibilidade enfrentadas no ensino superior. Desenvolvemos microfones direcionais conectados a IA de fala-para-texto com vocabulário técnico acadêmico.',
     tags: ['IA', 'Acessibilidade', 'Inclusão', 'Mobile'],
@@ -35,11 +39,11 @@ export const MURAL_PROJECTS = [
     ]
   },
 
-  // TECNOLOGIA + ENGENHARIA
+  // TECNOLOGIA + ENGENHARIA + EDUCAÇÃO
   {
     project_id: 102,
     name: 'OpenLab: Gêmeos Digitais para Laboratórios',
-    areas: ['Tecnologia', 'Engenharia'],
+    areas: ['Desenvolvimento de Software & TI', 'Engenharia, Hardware & Automação', 'Educação, Treinamento & EdTech'],
     summary: 'Simulação WebGL de bancadas de eletrônica e química para faculdades sem infraestrutura física avançada.',
     description: 'Permitir que alunos realizem práticas laboratoriais avançadas no próprio navegador antes das aulas presenciais, reduzindo risco de acidentes e quebra de componentes caros.',
     tags: ['WebGL', 'Simulação', 'Educação', 'Computação Gráfica'],
@@ -56,7 +60,7 @@ export const MURAL_PROJECTS = [
   {
     project_id: 103,
     name: 'GlicoTrack: Gestão Pediátrica de Diabetes',
-    areas: ['Saúde', 'Tecnologia'],
+    areas: ['Saúde, Biológicas & Bem-Estar', 'Desenvolvimento de Software & TI'],
     summary: 'App gamificado e mascote virtual para crianças com diabetes tipo 1 monitorarem glicemia com menor estresse.',
     description: 'Acompanhamento interativo e leve da rotina glicêmica, transformando medições e contagem de carboidratos em conquistas lúdicas compartilhadas com pais e pediatras.',
     tags: ['Saúde Digital', 'Gamificação', 'Pediatria', 'Nutrição'],
@@ -69,11 +73,11 @@ export const MURAL_PROJECTS = [
     ]
   },
 
-  // SAÚDE + TECNOLOGIA
+  // SAÚDE + DADOS
   {
     project_id: 104,
     name: 'NeuroSync: Monitor de Burnout Acadêmico',
-    areas: ['Saúde', 'Tecnologia'],
+    areas: ['Saúde, Biológicas & Bem-Estar', 'Dados, Inteligência Artificial & Analytics'],
     summary: 'Wearable e algoritmo preditivo para detecção precoce de fadiga cognitiva extrema em universitários.',
     description: 'Análise de variabilidade da frequência cardíaca (HRV) combinada com diário emocional para identificar picos de estresse crônico antes da semana de provas.',
     tags: ['Neurociência', 'Wearables', 'Psicologia', 'Data Science'],
@@ -90,7 +94,7 @@ export const MURAL_PROJECTS = [
   {
     project_id: 105,
     name: 'JurisClaro: Contratos Acessíveis para PMEs',
-    areas: ['Direito', 'Tecnologia'],
+    areas: ['Direito, Regulação & Políticas Públicas', 'Desenvolvimento de Software & TI'],
     summary: 'Auditoria de cláusulas de risco e tradução de jargões jurídicos para microempreendedores periféricos.',
     description: 'O JurisClaro traduz o juridiquês em linguagem clara, aponta riscos contratuais frequentes e sugere alternativas equilibradas para quem não pode pagar bancas de advocacia.',
     tags: ['LegalTech', 'Impacto Social', 'IA', 'Empreendedorismo'],
@@ -107,7 +111,7 @@ export const MURAL_PROJECTS = [
   {
     project_id: 106,
     name: 'DefensoriaTech: Triagem de Ações Coletivas',
-    areas: ['Direito', 'Tecnologia'],
+    areas: ['Direito, Regulação & Políticas Públicas', 'Desenvolvimento de Software & TI'],
     summary: 'Canal comunitário para mapear queixas habitacionais e gerar dossiês para a Defensoria Pública.',
     description: 'Plataforma para associações de bairro registrarem violações ao direito à moradia, saneamento e transporte, agrupando evidências de forma estruturada para ações civis públicas.',
     tags: ['Direitos Humanos', 'Habitação', 'Mobilização', 'Open Data'],
@@ -120,11 +124,11 @@ export const MURAL_PROJECTS = [
     ]
   },
 
-  // NEGÓCIOS + ENGENHARIA
+  // NEGÓCIOS + ENGENHARIA + ESG
   {
     project_id: 107,
     name: 'CicloVerde: Logística Reversa Universitária',
-    areas: ['Negócios', 'Engenharia'],
+    areas: ['Negócios, Gestão & Estratégia', 'Engenharia, Hardware & Automação', 'Meio Ambiente, Agro & Sustentabilidade (ESG)'],
     summary: 'Marketplace de componentes reaproveitáveis e urnas de descarte de hardware eletrônico no campus.',
     description: 'Campi descartam quilos de placas, telas e fontes todo semestre. O CicloVerde cria uma ponte circular para teste, catálogo e doação de peças funcionais para laboratórios e alunos.',
     tags: ['Economia Circular', 'Sustentabilidade', 'ESG', 'Hardware'],
@@ -141,7 +145,7 @@ export const MURAL_PROJECTS = [
   {
     project_id: 108,
     name: 'UniMatch: Estágios em Desafios Reais',
-    areas: ['Negócios', 'Design'],
+    areas: ['Negócios, Gestão & Estratégia', 'Design, UI/UX & Criatividade Visual'],
     summary: 'Plataforma para conectar ONGs e pequenas empresas a squads multidisciplinares de estudantes.',
     description: 'Em vez de vagas burocráticas, empresas publicam desafios práticos de 6 semanas onde equipes com alunos de marketing, código e gestão entregam soluções conjuntas.',
     tags: ['EdTech', 'Recrutamento', 'Squads', 'Empregabilidade'],
@@ -154,11 +158,11 @@ export const MURAL_PROJECTS = [
     ]
   },
 
-  // DESIGN + TECNOLOGIA
+  // DESIGN + TECNOLOGIA + HUMANIDADES
   {
     project_id: 109,
     name: 'Arandu: Narrativas Indígenas em AR',
-    areas: ['Design', 'Tecnologia'],
+    areas: ['Design, UI/UX & Criatividade Visual', 'Desenvolvimento de Software & TI', 'Humanidades, Ciências Sociais & Cultura'],
     summary: 'Livro didático com animações 3D e relatos orais em línguas originárias para escolas de ensino fundamental.',
     description: 'Em cocriação com lideranças e professores indígenas, o livro físico ganha vida pelo celular com ilustrações animadas e narrações tradicionais bilíngues.',
     tags: ['Cultura', 'Realidade Aumentada', 'Design Editorial', 'WebXR'],
@@ -171,11 +175,11 @@ export const MURAL_PROJECTS = [
     ]
   },
 
-  // DESIGN + SAÚDE
+  // DESIGN + SAÚDE + EDUCAÇÃO
   {
     project_id: 110,
     name: 'TypoLab: Tipografia Inclusiva para Dislexia',
-    areas: ['Design', 'Saúde'],
+    areas: ['Design, UI/UX & Criatividade Visual', 'Saúde, Biológicas & Bem-Estar', 'Educação, Treinamento & EdTech'],
     summary: 'Família tipográfica variável calibrada para legibilidade em apostilas e plataformas de ensino superior.',
     description: 'Desenvolvimento e testes de fontes digitais com compensação de peso inferior e distinção geométrica entre glifos frequentemente espelhados por estudantes disléxicos.',
     tags: ['Design Tipográfico', 'Acessibilidade', 'Educação', 'Neurologia'],
@@ -188,11 +192,11 @@ export const MURAL_PROJECTS = [
     ]
   },
 
-  // ENGENHARIA + SAÚDE
+  // ENGENHARIA + ESG
   {
     project_id: 111,
     name: 'SolarDrop: Dessalinizador Solar Passivo',
-    areas: ['Engenharia', 'Saúde'],
+    areas: ['Engenharia, Hardware & Automação', 'Meio Ambiente, Agro & Sustentabilidade (ESG)'],
     summary: 'Equipamento modular de purificação solar de água salobra de baixo custo para comunidades do semiárido.',
     description: 'Sistema térmico solar que purifica até 10 litros de água por dia sem eletricidade, usando peças rotomoldadas e plástico reciclável com fácil manutenção local.',
     tags: ['Saneamento', 'Energia Solar', 'Mecânica', 'Impacto Social'],
@@ -209,7 +213,7 @@ export const MURAL_PROJECTS = [
   {
     project_id: 112,
     name: 'BioPrótese: Membros Mecânicos em 3D',
-    areas: ['Engenharia', 'Saúde'],
+    areas: ['Engenharia, Hardware & Automação', 'Saúde, Biológicas & Bem-Estar'],
     summary: 'Próteses mioelétricas de membros superiores com sensores mioelétricos e custo 85% inferior ao mercado.',
     description: 'Fabricação distribuída de próteses de mão e antebraço acionadas por sinais musculares superficiais, com arquivos abertos e customização conforme a anatomia do usuário.',
     tags: ['Biomecânica', 'Impressão 3D', 'Robótica', 'Saúde'],

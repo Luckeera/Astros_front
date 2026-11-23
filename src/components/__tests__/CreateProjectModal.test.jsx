@@ -4,9 +4,11 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import CreateProjectModal from '../CreateProjectModal';
 import { projectService } from '../../services/api';
 
+const mockUser = { user_id: 1, name: 'Lucas Valente' };
+
 vi.mock('../../context/AuthContext', () => ({
   useAuth: () => ({
-    user: { user_id: 1, name: 'Lucas Valente' },
+    user: mockUser,
     token: 'mock-token'
   })
 }));
@@ -18,6 +20,9 @@ vi.mock('react-router-dom', () => ({
 vi.mock('../../services/api', () => ({
   projectService: {
     createProject: vi.fn().mockResolvedValue({ project_id: 42, name: 'Novo Projeto de Teste' })
+  },
+  macroAreaService: {
+    getMacroAreas: vi.fn().mockResolvedValue([])
   }
 }));
 

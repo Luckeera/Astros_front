@@ -143,11 +143,18 @@ export default function MuralScreen() {
   // Contagem por área considerando todos os projetos
   const areaCounts = useMemo(() => {
     const counts = { all: allProjects.length };
-    allProjects.forEach((p) => {
-      const areas = p.areas || [p.area];
-      areas.forEach((a) => {
-        counts[a] = (counts[a] || 0) + 1;
-      });
+    MURAL_AREAS.forEach((ma) => {
+      if (ma.id === 'all') return;
+      const count = allProjects.filter((p) => {
+        const areas = p.areas || [p.area];
+        return areas.some((a) =>
+          a === ma.id ||
+          a?.toLowerCase() === ma.id?.toLowerCase() ||
+          a?.toLowerCase().includes(ma.id?.toLowerCase()) ||
+          ma.id?.toLowerCase().includes(a?.toLowerCase())
+        );
+      }).length;
+      counts[ma.id] = count;
     });
     return counts;
   }, [allProjects]);
@@ -156,7 +163,13 @@ export default function MuralScreen() {
   const filterProject = (proj) => {
     if (selectedArea !== 'all') {
       const areas = proj.areas || [proj.area];
-      if (!areas.includes(selectedArea)) return false;
+      const matchArea = areas.some((a) =>
+        a === selectedArea ||
+        a?.toLowerCase() === selectedArea?.toLowerCase() ||
+        a?.toLowerCase().includes(selectedArea?.toLowerCase()) ||
+        selectedArea?.toLowerCase().includes(a?.toLowerCase())
+      );
+      if (!matchArea) return false;
     }
     if (onlyOpenRoles) {
       const hasOpen = proj.roles?.some(r => !r.is_filled);

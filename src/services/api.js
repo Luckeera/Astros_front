@@ -9,9 +9,23 @@ const getHeaders = (token) => ({
 });
 
 export const postService = {
-  async getFeed(token, courseId, filter = 'course') {
-    let endpoint = `/posts/course/${courseId}`;
-    if (filter === 'target') endpoint = `/posts/course/${courseId}/contributions`;
+  async getFeed(token, macroAreaId, filter = 'macro_area', secondaryMacroAreaId = null) {
+    let endpoint = '/posts/';
+    if (filter === 'course') {
+      endpoint = `/posts/course/${macroAreaId}`;
+    } else if (filter === 'target') {
+      if (macroAreaId) {
+        const queryParam = secondaryMacroAreaId ? `?secondary_id=${secondaryMacroAreaId}` : '';
+        endpoint = `/posts/macro-area/${macroAreaId}/contributions${queryParam}`;
+      } else {
+        endpoint = '/posts/';
+      }
+    } else if (macroAreaId) {
+      const queryParam = secondaryMacroAreaId ? `?secondary_id=${secondaryMacroAreaId}` : '';
+      endpoint = `/posts/macro-area/${macroAreaId}${queryParam}`;
+    } else {
+      endpoint = '/posts/';
+    }
     
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       headers: getHeaders(token),

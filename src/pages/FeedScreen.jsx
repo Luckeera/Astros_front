@@ -8,14 +8,16 @@ import PostSkeleton from '../components/ui/PostSkeleton';
 
 const FeedScreen = ({ onNavigateToDetail }) => {
   const [posts, setPosts] = useState([]);
-  const [filter, setFilter] = useState('course');
+  const [filter, setFilter] = useState('macro_area');
   const [loading, setLoading] = useState(true);
   const { user, token } = useAuth();
   
   const fetchPosts = async () => {
     setLoading(true);
     try {
-      const data = await postService.getFeed(token, user.course_id, filter);
+      const primaryMacroId = user?.macro_area_id || user?.macro_area?.macro_area_id;
+      const secondaryMacroId = user?.secondary_macro_area_id || user?.secondary_macro_area?.macro_area_id;
+      const data = await postService.getFeed(token, primaryMacroId, filter, secondaryMacroId);
       setPosts(Array.isArray(data) ? data : []);
     } catch (err) { 
       console.error('Fetch error:', err); 
@@ -41,7 +43,7 @@ const FeedScreen = ({ onNavigateToDetail }) => {
     <div className="w-full max-w-3xl mx-auto py-12 px-4 md:px-6">
       <header className="mb-12 text-center">
         <h2 className="text-4xl font-black text-gray-900 tracking-tighter mb-3">Feed Acadêmico</h2>
-        <p className="text-gray-400 font-bold text-xs uppercase tracking-[0.2em]">Explore projetos e conexões na sua área.</p>
+        <p className="text-gray-400 font-bold text-xs uppercase tracking-[0.2em]">Explore projetos e conexões nas suas competências práticas.</p>
       </header>
       
       <FilterChips activeFilter={filter} setActiveFilter={setFilter} />
@@ -64,7 +66,7 @@ const FeedScreen = ({ onNavigateToDetail }) => {
                 <Search className="h-12 w-12 text-gray-200" />
               </div>
               <p className="text-gray-400 font-black uppercase tracking-widest text-[10px]">Nenhum post encontrado para este filtro.</p>
-              <button onClick={() => setFilter('course')} className="mt-8 text-[#FFA900] text-xs font-black hover:underline uppercase tracking-widest border-2 border-orange-100 px-6 py-2.5 rounded-full hover:bg-orange-50 transition-colors">Recarregar Feed</button>
+              <button onClick={() => setFilter('macro_area')} className="mt-8 text-[#FFA900] text-xs font-black hover:underline uppercase tracking-widest border-2 border-orange-100 px-6 py-2.5 rounded-full hover:bg-orange-50 transition-colors">Recarregar Feed</button>
             </div>
           )}
         </div>

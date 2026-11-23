@@ -123,6 +123,7 @@ export default function InterviewScreen({ embedded = false }) {
     project_name: '',
     project_description: '',
     project_area: 'Tecnologia',
+    project_macro_area_ids: [],
     roles: [
       { role_name: 'UI/UX Designer', role_explanation: 'Design da interface e experiência do usuário.', role_quantity: 1 },
       { role_name: 'Desenvolvedor', role_explanation: 'Implementação de funcionalidades e protótipo.', role_quantity: 1 }
@@ -221,6 +222,19 @@ export default function InterviewScreen({ embedded = false }) {
       respondent_macro_area: '',
       respondent_secondary_macro_area: ''
     }));
+  };
+
+  const handleToggleProjectMacroArea = (id) => {
+    setExperience((prev) => {
+      const current = prev.project_macro_area_ids || [];
+      if (current.includes(id)) {
+        return { ...prev, project_macro_area_ids: current.filter((x) => x !== id) };
+      }
+      if (current.length >= 3) {
+        return { ...prev, project_macro_area_ids: [...current.slice(1), id] };
+      }
+      return { ...prev, project_macro_area_ids: [...current, id] };
+    });
   };
 
   // Carrega projetos reais do banco de dados
@@ -367,10 +381,17 @@ export default function InterviewScreen({ embedded = false }) {
       // 1. Projeto próprio criado na Etapa 2 (se preenchido e desejado)
       const projectsToCreate = [];
       if (experience.wants_to_create_project && experience.project_name.trim().length >= 2) {
+        const projectMacroIds = (experience.project_macro_area_ids && experience.project_macro_area_ids.length > 0)
+          ? experience.project_macro_area_ids.map(Number)
+          : (profile.macro_area_ids && profile.macro_area_ids.length > 0
+              ? profile.macro_area_ids.map(Number)
+              : (profile.macro_area_id ? [Number(profile.macro_area_id)] : []));
+
         projectsToCreate.push({
           name: experience.project_name.trim(),
           description: experience.project_description.trim(),
           area: experience.project_area,
+          macro_area_ids: projectMacroIds,
           roles: (experience.roles || [])
             .filter((r) => r.role_name && r.role_name.trim().length > 0)
             .map((r) => ({
@@ -388,6 +409,7 @@ export default function InterviewScreen({ embedded = false }) {
           name: ap.name.trim(),
           description: ap.description.trim(),
           area: ap.area,
+          macro_area_ids: Array.isArray(ap.macro_area_ids) ? ap.macro_area_ids.map(Number) : [],
           roles: (ap.roles || [])
             .filter((r) => r.role_name && r.role_name.trim().length > 0)
             .map((r) => ({
@@ -469,6 +491,7 @@ export default function InterviewScreen({ embedded = false }) {
       project_name: '',
       project_description: '',
       project_area: 'Tecnologia',
+      project_macro_area_ids: [],
       roles: [
         { role_name: 'UI/UX Designer', role_explanation: 'Design da interface.', role_quantity: 1 },
         { role_name: 'Desenvolvedor', role_explanation: 'Implementação de funcionalidades.', role_quantity: 1 }
@@ -1100,7 +1123,14 @@ export default function InterviewScreen({ embedded = false }) {
                   <div className="flex gap-3 mb-4">
                     <button
                       type="button"
-                      onClick={() => setExperience({ ...experience, wants_to_create_project: true })}
+                      onClick={() => {
+                        const defaultMacroIds = (experience.project_macro_area_ids && experience.project_macro_area_ids.length > 0)
+                          ? experience.project_macro_area_ids
+                          : (profile.macro_area_ids && profile.macro_area_ids.length > 0
+                              ? profile.macro_area_ids
+                              : (profile.macro_area_id ? [Number(profile.macro_area_id)] : []));
+                        setExperience({ ...experience, wants_to_create_project: true, project_macro_area_ids: defaultMacroIds });
+                      }}
                       className={`flex-1 py-2.5 px-4 rounded-xl border-2 font-black text-xs uppercase tracking-wider transition-all ${
                         experience.wants_to_create_project
                           ? 'bg-gray-900 text-white border-gray-900 shadow-[2px_2px_0px_#000]'
@@ -1213,6 +1243,44 @@ export default function InterviewScreen({ embedded = false }) {
                             Escreva pelo menos mais {10 - experience.project_description.trim().length} caractere(s) para poder avançar.
                           </p>
                         )}
+                      </div>
+
+                      {/* Macro Áreas do Projeto Criado */}
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <div>
+                            <label className="text-xs font-black uppercase tracking-wider text-gray-700 block">
+                              Macro Áreas do Projeto (Habilidades & Domínios):
+                            </label>
+                            <span className="text-[11px] text-gray-500 font-medium">
+                              Selecione até 3 macro áreas em que este projeto se enquadra para categorizá-lo no Mural.
+                            </span>
+                          </div>
+                          <span className="text-[11px] font-bold text-gray-400">
+                            {(experience.project_macro_area_ids?.length || 0)}/3
+                          </span>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-1.5 border-2 border-gray-900 rounded-xl bg-white">
+                          {macroAreasList.map((macro) => {
+                            const isSelected = (experience.project_macro_area_ids || []).includes(macro.macro_area_id);
+                            return (
+                              <button
+                                key={macro.macro_area_id}
+                                type="button"
+                                onClick={() => handleToggleProjectMacroArea(macro.macro_area_id)}
+                                className={`px-2.5 py-1.5 rounded-lg border text-xs font-bold flex items-center gap-1.5 transition-all ${
+                                  isSelected
+                                    ? 'bg-[#FFA900] text-black border-black shadow-[1px_1px_0px_#000]'
+                                    : 'bg-gray-50 text-gray-700 border-gray-200 hover:border-gray-900 hover:bg-white'
+                                }`}
+                              >
+                                {isSelected && <Check className="h-3 w-3 stroke-[3]" />}
+                                <span>{macro.name}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
                       </div>
 
                       <div>

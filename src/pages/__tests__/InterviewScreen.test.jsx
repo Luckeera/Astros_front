@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import InterviewScreen from '../InterviewScreen';
 import { projectService, interviewService } from '../../services/api';
@@ -143,10 +143,12 @@ describe('InterviewScreen Component', () => {
     // Etapa 3: Degustação do Mural
     await screen.findByText(/12\. Degustação do Mural de Projetos/i);
 
-    // Clica no Preview de um projeto mock
-    const previewButtons = screen.getAllByText(/Ver Preview/i);
-    expect(previewButtons.length).toBeGreaterThan(0);
-    fireEvent.click(previewButtons[0]);
+    // Clica no Preview de uma ideia sugerida (mock)
+    const suggestedIdeaBadges = screen.getAllByText(/💡 Ideia Sugerida/i);
+    expect(suggestedIdeaBadges.length).toBeGreaterThan(0);
+    const mockCard = suggestedIdeaBadges[0].closest('div.rounded-2xl');
+    const previewBtn = within(mockCard).getByText(/Ver Preview/i);
+    fireEvent.click(previewBtn);
 
     // Clica em "Quero Adotar Esta Ideia 🚀"
     const adoptButton = await screen.findByRole('button', { name: /Quero Adotar Esta Ideia 🚀/i });

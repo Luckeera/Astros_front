@@ -63,8 +63,16 @@ export default function IntegratedMural() {
   const filteredProjects = useMemo(() => {
     return allProjects.filter((p) => {
       const matchArea = selectedArea === 'all' || 
-        (p.areas && p.areas.some(a => a.toLowerCase() === selectedArea.toLowerCase())) ||
-        (p.area && p.area.toLowerCase() === selectedArea.toLowerCase());
+        (p.areas && p.areas.some(a => 
+          a.toLowerCase() === selectedArea.toLowerCase() ||
+          a.toLowerCase().includes(selectedArea.toLowerCase()) ||
+          selectedArea.toLowerCase().includes(a.toLowerCase())
+        )) ||
+        (p.area && (
+          p.area.toLowerCase() === selectedArea.toLowerCase() ||
+          p.area.toLowerCase().includes(selectedArea.toLowerCase()) ||
+          selectedArea.toLowerCase().includes(p.area.toLowerCase())
+        ));
       
       const matchSearch = !searchTerm.trim() || 
         p.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
